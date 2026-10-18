@@ -6,7 +6,7 @@ modules, `iam`, `analytics` and `notifications`, each with its own database. You
 is written, then replace them with your own.
 
 ```bash
-composer create-project mk-josias/laravel-distributable-modules-starter my-app
+composer create-project mk-josias/laravel-distributable-starter my-app
 ```
 
 Requires PHP 8.4+, and Redis for the event stream.

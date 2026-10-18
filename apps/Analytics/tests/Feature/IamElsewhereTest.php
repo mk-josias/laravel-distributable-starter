@@ -2,12 +2,12 @@
 
 namespace Apps\Analytics\Tests\Feature;
 
+use Distributable\RpcHttp\RpcSignature;
 use Foundation\Iam\Auth\TrustedIdentity;
 use Foundation\Iam\Contracts\IamService;
 use Foundation\Iam\Services\IamRpcService;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
-use RpcHttp\RpcSignature;
 use Tests\ModuleTestCase;
 
 /** iam runs elsewhere: analytics authenticates the gateway's X-Identity alone, and reads iam over signed HTTP. */

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d48d0a3970970b0a9b3d91ef1b86c3fc",
+    "content-hash": "f2d56c32840ae2bc0914d799eba3e1d8",
     "packages": [
         {
             "name": "brick/math",
@@ -2659,12 +2659,12 @@
             "time": "2026-03-08T20:05:35+00:00"
         },
         {
-            "name": "mk-josias/laravel-distributable-modules",
+            "name": "mk-josias/laravel-distributable",
             "version": "0.2.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "4a5276b86d2f0bb8f10ca2bfffe5a7f18a259eca"
+                "reference": "d635e18b9c7fc4c0a923f6d67b5c53e20a4e79fe"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2672,9 +2672,9 @@
             },
             "suggest": {
                 "laravel/octane": "High-throughput application server; the kernel also runs under plain FPM",
-                "mk-josias/laravel-microservices-rpc-http": "Calls to a module running in another process, over signed HTTP",
-                "mk-josias/laravel-microservices-stream-queue": "The queue events driver, for a stack without Redis",
-                "mk-josias/laravel-microservices-stream-redis": "The redis events driver, on Redis Streams"
+                "mk-josias/laravel-distributable-rpc-http": "Calls to a module running in another process, over signed HTTP",
+                "mk-josias/laravel-distributable-stream-queue": "The queue events driver, for a stack without Redis",
+                "mk-josias/laravel-distributable-stream-redis": "The redis events driver, on Redis Streams"
             },
             "type": "library",
             "extra": {
@@ -2715,28 +2715,28 @@
             }
         },
         {
-            "name": "mk-josias/laravel-microservices-rpc-http",
+            "name": "mk-josias/laravel-distributable-rpc-http",
             "version": "0.2.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/rpc-http",
-                "reference": "defb8f2424473df5b01102763a889653bd5a3008"
+                "reference": "283cbf123c2d7a4b3888470a9014109bca1e3728"
             },
             "require": {
-                "mk-josias/laravel-distributable-modules": "self.version",
+                "mk-josias/laravel-distributable": "self.version",
                 "php": "^8.4"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "RpcHttp\\RpcHttpServiceProvider"
+                        "Distributable\\RpcHttp\\RpcHttpServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "RpcHttp\\": "src/"
+                    "Distributable\\RpcHttp\\": "src/"
                 }
             },
             "license": [
@@ -2748,7 +2748,7 @@
                     "email": "josiasmekontso.it@gmail.com"
                 }
             ],
-            "description": "HTTP driver for the RPC of mk-josias/laravel-microservices: signed calls between services, one endpoint per service.",
+            "description": "HTTP driver for the RPC of mk-josias/laravel-distributable: signed calls between services, one endpoint per service.",
             "homepage": "https://mk-josias.github.io/laravel-microservices/",
             "keywords": [
                 "http",
@@ -2762,15 +2762,15 @@
             }
         },
         {
-            "name": "mk-josias/laravel-microservices-stream-redis",
+            "name": "mk-josias/laravel-distributable-stream-redis",
             "version": "0.2.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/stream-redis",
-                "reference": "79ad5e779bb4f30bc8df210745d53121b0f9d7d3"
+                "reference": "69835dd0156b437754ccfa75aec03c3445a9cc32"
             },
             "require": {
-                "mk-josias/laravel-distributable-modules": "self.version",
+                "mk-josias/laravel-distributable": "self.version",
                 "php": "^8.4"
             },
             "suggest": {
@@ -2780,13 +2780,13 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "StreamRedis\\StreamRedisServiceProvider"
+                        "Distributable\\Stream\\Redis\\StreamRedisServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "StreamRedis\\": "src/"
+                    "Distributable\\Stream\\Redis\\": "src/"
                 }
             },
             "license": [
@@ -2798,7 +2798,7 @@
                     "email": "josiasmekontso.it@gmail.com"
                 }
             ],
-            "description": "Redis Streams driver for the events of mk-josias/laravel-microservices: one ordered stream, a consumer group per service, failed entries retried before later ones, or dropped.",
+            "description": "Redis Streams driver for the events of mk-josias/laravel-distributable: one ordered stream, a consumer group per service, failed entries retried before later ones, or dropped.",
             "homepage": "https://mk-josias.github.io/laravel-microservices/",
             "keywords": [
                 "events",

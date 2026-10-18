@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "mk-josias/laravel-distributable-modules-starter",
+    "name": "mk-josias/laravel-distributable-starter",
     "type": "project",
     "description": "Starter kit for laravel-distributable-modules: a modular monolith deployable as one process or as per-module services.",
     "keywords": ["laravel", "modular-monolith", "distributable", "starter-kit"],
@@ -12,9 +12,9 @@
         "laravel/octane": "^2.20",
         "laravel/reverb": "^1.12",
         "laravel/tinker": "^3.0",
-        "mk-josias/laravel-microservices-rpc-http": "^0.2",
-        "mk-josias/laravel-distributable-modules": "^0.2",
-        "mk-josias/laravel-microservices-stream-redis": "^0.2",
+        "mk-josias/laravel-distributable-rpc-http": "^0.2",
+        "mk-josias/laravel-distributable": "^0.2",
+        "mk-josias/laravel-distributable-stream-redis": "^0.2",
         "spatie/laravel-data": "^4.0",
         "spatie/laravel-query-builder": "^6.0 || ^7.0",
         "wikimedia/composer-merge-plugin": "^2.1"
@@ -114,10 +114,10 @@
             "options": {
                 "symlink": true,
                 "versions": {
-                    "mk-josias/laravel-distributable-modules": "0.2.0",
-                    "mk-josias/laravel-microservices-rpc-http": "0.2.0",
-                    "mk-josias/laravel-microservices-stream-redis": "0.2.0",
-                    "mk-josias/laravel-microservices-stream-queue": "0.2.0"
+                    "mk-josias/laravel-distributable": "0.2.0",
+                    "mk-josias/laravel-distributable-rpc-http": "0.2.0",
+                    "mk-josias/laravel-distributable-stream-redis": "0.2.0",
+                    "mk-josias/laravel-distributable-stream-queue": "0.2.0"
                 }
             }
         }
