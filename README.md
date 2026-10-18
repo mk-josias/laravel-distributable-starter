@@ -515,15 +515,17 @@ $user = $this->inModuleOf(User::class, fn () => User::query()->create([...]));
 Laravel's `make:*` commands take `--module`:
 
 ```bash
-# a new module, declared in config/distributable.php and composer.json
+# a new module, declared in config/distributable.php
 php artisan modules:make <module> --database
 # apps/Notifications/app/Models, its migration and its factory
 php artisan make:model Preference -mf --module=notifications
 php artisan make:controller PreferenceController --module=notifications
 ```
 
-`composer.json` lists each module and the foundation under `autoload.psr-4`. The application doesn't
-need those entries: the package autoloads the modules itself. They let your IDE resolve the classes.
+The root `composer.json` lists the foundation under `autoload.psr-4`, and each module's own
+`composer.json` its classes. The application doesn't need those entries: the package autoloads the
+modules itself. They let your IDE resolve the classes, through the merge described below; a new
+module needs its own, as in `apps/Iam/composer.json`.
 
 A library only one module uses goes in that module's `composer.json`, as `spatie/laravel-permission`
 does in `apps/Iam/composer.json`. The root `composer.json` merges `apps/*/composer.json`

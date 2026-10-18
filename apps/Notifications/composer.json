@@ -1,0 +1,14 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Apps\\Notifications\\": "app/",
+            "Apps\\Notifications\\Database\\Factories\\": "database/factories/",
+            "Apps\\Notifications\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Apps\\Notifications\\Tests\\": "tests/"
+        }
+    }
+}

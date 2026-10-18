@@ -1,0 +1,14 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Apps\\Analytics\\": "app/",
+            "Apps\\Analytics\\Database\\Factories\\": "database/factories/",
+            "Apps\\Analytics\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Apps\\Analytics\\Tests\\": "tests/"
+        }
+    }
+}

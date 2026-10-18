@@ -34,24 +34,12 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Foundation\\": "foundation/",
-            "Apps\\Iam\\": "apps/Iam/app/",
-            "Apps\\Iam\\Database\\Factories\\": "apps/Iam/database/factories/",
-            "Apps\\Iam\\Database\\Seeders\\": "apps/Iam/database/seeders/",
-            "Apps\\Analytics\\": "apps/Analytics/app/",
-            "Apps\\Analytics\\Database\\Factories\\": "apps/Analytics/database/factories/",
-            "Apps\\Analytics\\Database\\Seeders\\": "apps/Analytics/database/seeders/",
-            "Apps\\Notifications\\": "apps/Notifications/app/",
-            "Apps\\Notifications\\Database\\Factories\\": "apps/Notifications/database/factories/",
-            "Apps\\Notifications\\Database\\Seeders\\": "apps/Notifications/database/seeders/"
+            "Foundation\\": "foundation/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/",
-            "Apps\\Iam\\Tests\\": "apps/Iam/tests/",
-            "Apps\\Analytics\\Tests\\": "apps/Analytics/tests/",
-            "Apps\\Notifications\\Tests\\": "apps/Notifications/tests/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {
