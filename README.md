@@ -395,7 +395,7 @@ IAM_HOST=http://iam.internal:8000
 
 `config/distributable.php` declares every module in every process, so `analytics` still listens to
 iam's events and calls iam over HTTP through `IamRpcService`. Both processes must share `APP_KEY`,
-or the same `MICROSERVICES_RPC_SECRET`.
+or the same `DISTRIBUTABLE_RPC_SECRET`.
 
 When you build an image for one module, delete the folders of the others before
 `composer dump-autoload`:

@@ -72,7 +72,7 @@ redis DEL "$key" >/dev/null
 echo "ok: on a cache miss, Traefik asked iam, which filled $key as JSON"
 
 [[ $(as_traefik SET "$key" x) == *NOPERM* ]] || fail "Traefik's Redis user can write"
-[[ $(as_traefik XRANGE database:microservices:events - +) == *NOPERM* ]] || fail "Traefik's Redis user can read the stream"
+[[ $(as_traefik XRANGE database:distributable:events - +) == *NOPERM* ]] || fail "Traefik's Redis user can read the stream"
 echo "ok: Traefik's Redis user only reads the cached users"
 
 [[ $(status -X POST "$gateway/iam/rpc/findUser") == 404 ]] || fail "the RPC route is reachable through Traefik"

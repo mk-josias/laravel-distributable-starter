@@ -2664,7 +2664,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "72d961afa5d629366646030a98b1e139ff1fde11"
+                "reference": "4a5276b86d2f0bb8f10ca2bfffe5a7f18a259eca"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2680,7 +2680,6 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "Distributable\\Providers\\MicroservicesServiceProvider",
                         "Distributable\\Providers\\DistributableServiceProvider"
                     ]
                 }
