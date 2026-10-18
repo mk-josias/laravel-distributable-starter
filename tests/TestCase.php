@@ -36,8 +36,8 @@ abstract class TestCase extends BaseTestCase
 
             $this->databases[] = $file = (string) tempnam(sys_get_temp_dir(), "{$module->name}-");
 
-            config()->set("database.connections.{$module->connection()}.database", $file);
-            DB::purge($module->connection());
+            config()->set("database.connections.{$module->defaultConnection()}.database", $file);
+            DB::purge($module->defaultConnection());
         }
 
         $this->artisan('migrate')->assertSuccessful();

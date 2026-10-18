@@ -14,12 +14,14 @@ $pgsql = [
 ];
 
 return env('DB_CONNECTION') === 'pgsql' ? [
+    'default' => 'iam',
     'owner' => 'iam_owner',
     'connections' => [
         'iam' => [...$pgsql, 'username' => (string) env('DB_APP_USERNAME', 'distributable_app'), 'password' => (string) env('DB_APP_PASSWORD', '')],
         'iam_owner' => [...$pgsql, 'username' => (string) env('DB_USERNAME', 'distributable'), 'password' => (string) env('DB_PASSWORD', '')],
     ],
 ] : [
+    'default' => 'iam',
     'connections' => [
         'iam' => [
             'driver' => 'sqlite',
