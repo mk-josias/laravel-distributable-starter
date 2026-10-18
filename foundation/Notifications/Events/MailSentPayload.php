@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Foundation\Notifications\Events;
 
+use Distributable\Contracts\Stream\Versioned;
 use Foundation\Common\Data\Dto;
-use Microservices\Contracts\Stream\Versioned;
 
 /** What notifications.mail.sent carries: which notification left, to whom, about what. */
 final class MailSentPayload extends Dto implements Versioned

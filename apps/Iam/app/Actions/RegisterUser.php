@@ -6,10 +6,10 @@ namespace Apps\Iam\Actions;
 
 use Apps\Iam\Events\UserRegistered;
 use Apps\Iam\Models\User;
+use Distributable\Contracts\Stream\Bus;
 use Foundation\Common\Contracts\Action;
 use Foundation\Iam\Events\UserRegisteredPayload;
 use Illuminate\Support\Facades\DB;
-use Microservices\Contracts\Stream\Bus;
 
 final readonly class RegisterUser implements Action
 {

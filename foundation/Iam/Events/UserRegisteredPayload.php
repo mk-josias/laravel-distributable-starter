@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Foundation\Iam\Events;
 
+use Distributable\Contracts\Stream\Versioned;
 use Foundation\Common\Data\Dto;
-use Microservices\Contracts\Stream\Versioned;
 
 /** What iam.user.registered carries: what a consumer needs without calling iam back. */
 final class UserRegisteredPayload extends Dto implements Versioned

@@ -4,15 +4,15 @@ namespace Apps\Notifications\Tests\Feature;
 
 use Apps\Notifications\Events\NotificationPushed;
 use Apps\Notifications\Mail\NotificationMail;
+use Distributable\Contracts\Stream\Transport;
+use Distributable\Data\Envelope;
+use Distributable\Transports\Stream\ArrayTransport;
 use Foundation\Common\Broadcasting\PrivateUserChannel;
 use Foundation\Iam\Events\IamEvent;
 use Foundation\Notifications\Events\NotificationsEvent;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
-use Microservices\Contracts\Stream\Transport;
-use Microservices\Data\Envelope;
-use Microservices\Transports\Stream\ArrayTransport;
 use Tests\ModuleTestCase;
 
 class DeliveryTest extends ModuleTestCase

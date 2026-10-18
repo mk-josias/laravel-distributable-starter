@@ -9,7 +9,7 @@ compose=(docker compose -f "$compose_file")
 
 # In the monorepo, the image takes the packages from their folders rather than from Packagist.
 if [[ -d ../packages/core ]]; then
-    export DISTRIBUTABLE_PACKAGES=../packages/core MICROSERVICES_PACKAGES=../../laravel-microservices/packages
+    export DISTRIBUTABLE_PACKAGES=../packages
 fi
 
 gateway="http://localhost:${GATEWAY_PORT:-8000}"

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Apps\Analytics\Handlers;
 
 use Apps\Analytics\Models\Mail;
+use Distributable\Contracts\Stream\Handler;
 use Foundation\Notifications\Events\MailSentPayload;
-use Microservices\Contracts\Stream\Handler;
 
 final class RecordMail implements Handler
 {

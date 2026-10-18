@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "261c3cb27f181ed3bf038ce9a5fdbab9",
+    "content-hash": "a2ec3b92dabcb83ac45fe040080c24a1",
     "packages": [
         {
             "name": "brick/math",
@@ -2664,7 +2664,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "d6aab8fbe25d1ac4d6ff221e08da285f461f67ce"
+                "reference": "c886518f1d505743b7f1498b299d5e8fb2210cd7"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2698,6 +2698,7 @@
                 }
             ],
             "description": "The foundations for designing each Laravel module as a microservice: its code runs in a context bounded to its module, blind to the others, whether they run in the same process or in separate, distributed processes, and it talks to them only through contracts and events. Whether modules run as microservices or several to a process, depending on load, release pace or cost, becomes an infrastructure choice rather than a code one, allowing greater flexibility.",
+            "homepage": "https://mk-josias.github.io/laravel-distributable-modules/",
             "keywords": [
                 "distributable",
                 "events",
@@ -2717,8 +2718,8 @@
             "version": "0.2.0",
             "dist": {
                 "type": "path",
-                "url": "../../laravel-microservices/packages/core",
-                "reference": "eb5c4310cbe91cc7d0766aa6cc180edd8d56538b"
+                "url": "../packages/microservices",
+                "reference": "f9aca30e6baf11aab83640a028b05094f924b3d2"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2733,13 +2734,13 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "Microservices\\Providers\\MicroservicesServiceProvider"
+                        "Distributable\\Providers\\MicroservicesServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Microservices\\": "src/"
+                    "Distributable\\": "src/"
                 },
                 "files": [
                     "src/helpers.php"
@@ -2755,6 +2756,7 @@
                 }
             ],
             "description": "Laravel apps as microservices: signed RPC through contracts, events that can be made reliable, and read-only copies of another service's rows.",
+            "homepage": "https://mk-josias.github.io/laravel-microservices/",
             "keywords": [
                 "events",
                 "laravel",
@@ -2772,8 +2774,8 @@
             "version": "0.2.0",
             "dist": {
                 "type": "path",
-                "url": "../../laravel-microservices/packages/rpc-http",
-                "reference": "6f5f15902c790ba6753371273ece070ca1934d94"
+                "url": "../packages/rpc-http",
+                "reference": "87185190bf009364fcf27e84bcf9c767fc16e37b"
             },
             "require": {
                 "mk-josias/laravel-microservices": "self.version",
@@ -2802,6 +2804,7 @@
                 }
             ],
             "description": "HTTP driver for the RPC of mk-josias/laravel-microservices: signed calls between services, one endpoint per service.",
+            "homepage": "https://mk-josias.github.io/laravel-microservices/",
             "keywords": [
                 "http",
                 "laravel",
@@ -2818,8 +2821,8 @@
             "version": "0.2.0",
             "dist": {
                 "type": "path",
-                "url": "../../laravel-microservices/packages/stream-redis",
-                "reference": "e116b09345520d1da79588a64b0c8006e7b4febd"
+                "url": "../packages/stream-redis",
+                "reference": "b195ca77c7c22383e1b74e1ca4d9b51e30740101"
             },
             "require": {
                 "mk-josias/laravel-microservices": "self.version",
@@ -2851,6 +2854,7 @@
                 }
             ],
             "description": "Redis Streams driver for the events of mk-josias/laravel-microservices: one ordered stream, a consumer group per service, failed entries retried before later ones, or dropped.",
+            "homepage": "https://mk-josias.github.io/laravel-microservices/",
             "keywords": [
                 "events",
                 "laravel",

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Apps\Iam\Models;
 
+use Distributable\Contracts\Shadows\Shadowed;
+use Distributable\Traits\ShadowSource;
 use Foundation\Common\Auth\IsPrincipal;
 use Foundation\Common\Auth\Principal;
 use Foundation\Common\Database\Searchable;
@@ -11,8 +13,6 @@ use Foundation\Iam\Services\IamRpcService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
-use Microservices\Contracts\Shadows\Shadowed;
-use Microservices\Traits\ShadowSource;
 use Spatie\Permission\Traits\HasRoles;
 
 /**

@@ -55,8 +55,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       additional_contexts:
-        distributable: ${DISTRIBUTABLE_PACKAGES:-docker/no-packages}
-        microservices: ${MICROSERVICES_PACKAGES:-docker/no-packages}
+        packages: ${DISTRIBUTABLE_PACKAGES:-docker/no-packages}
     image: distributable-skeleton:mono
     environment:
       <<: *env

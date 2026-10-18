@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Apps\Notifications\Events;
 
+use Distributable\Events\Event;
 use Foundation\Notifications\Events\MailSentPayload;
 use Foundation\Notifications\Events\NotificationsEvent;
-use Microservices\Events\Event;
 
 final class MailSent extends Event
 {

@@ -108,15 +108,13 @@ final class SetupSkeleton extends Command
 
         $this->strip('docker/Dockerfile', [
             "# The packages from a local path (see \"repositories\" in composer.json); empty outside the monorepo.\n",
-            "COPY --from=distributable . /packages/core\n",
-            "COPY --from=microservices . /laravel-microservices/packages\n\n",
+            "COPY --from=packages . /packages\n\n",
             "COPY --from=vendor /packages /packages\n",
-            "COPY --from=vendor /laravel-microservices /laravel-microservices\n",
         ]);
 
         foreach (['docker-compose.yml', 'docker-compose.mono.yml'] as $file) {
             file_put_contents(base_path($file), (string) preg_replace(
-                '/^(\s+)additional_contexts:\n\1  distributable: .*\n\1  microservices: .*\n/m',
+                '/^(\s+)additional_contexts:\n\1  packages: .*\n/m',
                 '',
                 (string) file_get_contents(base_path($file)),
             ));
@@ -125,7 +123,7 @@ final class SetupSkeleton extends Command
         $this->strip('tests/e2e/together-or-apart.sh', [
             "# In the monorepo, the image takes the packages from their folders rather than from Packagist.\n"
             ."if [[ -d ../packages/core ]]; then\n"
-            ."    export DISTRIBUTABLE_PACKAGES=../packages/core MICROSERVICES_PACKAGES=../../laravel-microservices/packages\n"
+            ."    export DISTRIBUTABLE_PACKAGES=../packages\n"
             ."fi\n\n",
         ]);
 

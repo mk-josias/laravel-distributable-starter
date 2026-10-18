@@ -7,13 +7,13 @@ namespace Apps\Notifications\Jobs;
 use Apps\Notifications\Events\MailSent;
 use Apps\Notifications\Mail\NotificationMail;
 use Apps\Notifications\Models\Notification;
+use Distributable\Contracts\Stream\Bus;
 use Foundation\Notifications\Events\MailSentPayload;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use Microservices\Contracts\Stream\Bus;
 
 final class SendMail implements ShouldQueue
 {

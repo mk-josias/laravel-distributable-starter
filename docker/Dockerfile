@@ -7,8 +7,7 @@ ARG RUN_MODULES=*
 WORKDIR /app
 
 # The packages from a local path (see "repositories" in composer.json); empty outside the monorepo.
-COPY --from=distributable . /packages/core
-COPY --from=microservices . /laravel-microservices/packages
+COPY --from=packages . /packages
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
@@ -50,7 +49,6 @@ ENV RUN_MODULES=${RUN_MODULES} \
 WORKDIR /app
 
 COPY --from=vendor /packages /packages
-COPY --from=vendor /laravel-microservices /laravel-microservices
 COPY --from=vendor /app /app
 
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
