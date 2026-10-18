@@ -37,8 +37,8 @@ The client's own `X-Identity` is always dropped. The RPC routes (`/{module}/rpc/
 ## The routes (`dynamic/routers.yml`)
 
 Each router sends a path to the container serving it. The paths are the modules' route prefixes,
-`modules.routes.prefix` in `config/modules.php` (`{module}/{name}`, so `/iam/api`), or a module's
-own `modules.declared.{module}.prefix`. Traefik does not read that config: change a prefix there,
+`distributable.routes.prefix` in `config/distributable.php` (`{module}/{name}`, so `/iam/api`), or a module's
+own `distributable.declared.{module}.prefix`. Traefik does not read that config: change a prefix there,
 and change the router here.
 
 | Router | Rule | Service | Auth |

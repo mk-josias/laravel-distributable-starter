@@ -30,16 +30,17 @@ return [
     // Modules booted by THIS process: '*' = all, or a comma-separated list.
     'runs' => env('RUN_MODULES', '*'),
 
-    // {paths.modules}/{Module}/app is autoloaded as {namespaces.modules}\{Module}\, and
-    // {paths.foundation}/{Module} as {namespaces.foundation}\{Module}\: no entry to add to composer.json.
-    'paths' => [
-        'modules' => 'apps',
-        'foundation' => 'foundation',
+    // A module is {path}/{Module}, its classes {path}/{Module}/app under {namespace}\{Module}\, unless
+    // it declares its own path and namespace. No entry to add to composer.json.
+    'modules' => [
+        'path' => 'apps',
+        'namespace' => 'Apps',
     ],
 
-    'namespaces' => [
-        'modules' => 'Apps',
-        'foundation' => 'Foundation',
+    // What module iam shares is {path}/Iam, under {namespace}\Iam\.
+    'foundation' => [
+        'path' => 'foundation',
+        'namespace' => 'Foundation',
     ],
 
     // Path answering which modules this process runs (e.g. '/'), or null to register nothing.

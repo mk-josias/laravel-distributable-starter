@@ -102,7 +102,7 @@ On SQLite it is a plain table, and pruning deletes the rows.
 ## What is in the skeleton
 
 ```
-config/modules.php              declares the modules, and where they run when they run elsewhere;
+config/distributable.php        declares the modules, and where they run when they run elsewhere;
                                 calls and events keep laravel-microservices' defaults; each module
                                 declares its handlers in $handlers of its service provider
 apps/
@@ -393,7 +393,7 @@ RUN_MODULES=analytics
 IAM_HOST=http://iam.internal:8000
 ```
 
-`config/modules.php` declares every module in every process, so `analytics` still listens to
+`config/distributable.php` declares every module in every process, so `analytics` still listens to
 iam's events and calls iam over HTTP through `IamRpcService`. Both processes must share `APP_KEY`,
 or the same `MICROSERVICES_RPC_SECRET`.
 
@@ -515,7 +515,7 @@ $user = $this->inModuleOf(User::class, fn () => User::query()->create([...]));
 Laravel's `make:*` commands take `--module`:
 
 ```bash
-# a new module, declared in config/modules.php and composer.json
+# a new module, declared in config/distributable.php and composer.json
 php artisan modules:make <module> --database
 # apps/Notifications/app/Models, its migration and its factory
 php artisan make:model Preference -mf --module=notifications
