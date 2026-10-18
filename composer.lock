@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2d56c32840ae2bc0914d799eba3e1d8",
+    "content-hash": "7fb733b3027e434036dfffef06250e76",
     "packages": [
         {
             "name": "brick/math",
@@ -2664,7 +2664,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "d635e18b9c7fc4c0a923f6d67b5c53e20a4e79fe"
+                "reference": "e2850fc891ff6b39f6f4471689bbfe228ac7becb"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2673,7 +2673,6 @@
             "suggest": {
                 "laravel/octane": "High-throughput application server; the kernel also runs under plain FPM",
                 "mk-josias/laravel-distributable-rpc-http": "Calls to a module running in another process, over signed HTTP",
-                "mk-josias/laravel-distributable-stream-queue": "The queue events driver, for a stack without Redis",
                 "mk-josias/laravel-distributable-stream-redis": "The redis events driver, on Redis Streams"
             },
             "type": "library",
@@ -2720,7 +2719,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/rpc-http",
-                "reference": "283cbf123c2d7a4b3888470a9014109bca1e3728"
+                "reference": "50846b2751d2f129a2a471b943476c65716354d2"
             },
             "require": {
                 "mk-josias/laravel-distributable": "self.version",
@@ -2767,7 +2766,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/stream-redis",
-                "reference": "69835dd0156b437754ccfa75aec03c3445a9cc32"
+                "reference": "2a3e5b9894f7cc3010313e5ec38d7a9f16cbe005"
             },
             "require": {
                 "mk-josias/laravel-distributable": "self.version",

@@ -116,8 +116,7 @@
                 "versions": {
                     "mk-josias/laravel-distributable": "0.2.0",
                     "mk-josias/laravel-distributable-rpc-http": "0.2.0",
-                    "mk-josias/laravel-distributable-stream-redis": "0.2.0",
-                    "mk-josias/laravel-distributable-stream-queue": "0.2.0"
+                    "mk-josias/laravel-distributable-stream-redis": "0.2.0"
                 }
             }
         }
