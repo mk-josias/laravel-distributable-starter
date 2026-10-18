@@ -6,14 +6,13 @@ namespace Apps\Iam\Http\Requests;
 
 use Foundation\Common\Http\ApiRequest;
 
-final class IssueTokenRequest extends ApiRequest
+final class LogoutRequest extends ApiRequest
 {
+    use IdentifiesDevice;
+
     /** @return array<string, list<string>> */
     public function rules(): array
     {
-        return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ];
+        return [];
     }
 }

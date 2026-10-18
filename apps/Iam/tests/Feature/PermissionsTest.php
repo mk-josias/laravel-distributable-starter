@@ -22,7 +22,7 @@ class PermissionsTest extends ModuleTestCase
 
         config()->set('auth.permissions', [SamplePermission::class]);
         $this->artisan('iam:sync-permissions')->expectsOutputToContain('1 permissions declared, 0 deleted.')->assertSuccessful();
-        $this->postJson('/iam/api/v1/users', ['name' => 'Ada', 'email' => 'ada@example.com', 'password' => 'correct-horse'])->assertCreated();
+        $this->register()->assertCreated();
         $this->user = User::query()->firstOrFail();
     }
 

@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -18,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('*/api/*') || $request->is('*/rpc/*'),
+            fn (Request $request) => $request->expectsJson()
+                || array_intersect(['api', (string) config('rpc-http.middleware_group', 'rpc')], (array) $request->route()?->middleware()) !== [],
         );
 
         // The envelope is rendered here, once, for every exception that describes one — never

@@ -5,11 +5,15 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+            <directory>apps/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="Modules">
-            <directory>apps/*/tests</directory>
+            <directory>apps/*/tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
     <source>

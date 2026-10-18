@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Foundation\Common\Auth;
+namespace Foundation\Common\Http\Middleware;
 
 use Closure;
+use Foundation\Common\Auth\Identity;
+use Foundation\Common\Auth\PrincipalResolver;
+use Foundation\Common\Auth\TokenValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,11 +33,10 @@ class Authenticate
         return $next($request);
     }
 
-    /** A strategy that names a `header` in its config reads its token there; the others read the bearer token. */
+    /** Only the X-Identity the gateway signed: the client's own token never reaches a module's check. */
     protected function resolve(Request $request): ?Identity
     {
-        $header = config('auth.token_validation.'.config('auth.token_validation.strategy').'.header');
-        $token = is_string($header) ? $request->header($header) : $request->bearerToken();
+        $token = $request->header((string) config('auth.gateway.header'));
 
         return is_string($token) && $token !== '' ? $this->tokens->validate($token) : null;
     }

@@ -2,10 +2,7 @@
 
 use Foundation\Analytics\Enums\AnalyticsPermission;
 use Foundation\Common\Auth\LocalPrincipals;
-use Foundation\Iam\Auth\GatewayTokens;
 use Foundation\Iam\Auth\IamPermissions;
-use Foundation\Iam\Auth\JwtTokens;
-use Foundation\Iam\Auth\RpcTokens;
 use Foundation\Iam\Shadows\UserShadow;
 
 return [
@@ -29,23 +26,26 @@ return [
         ],
     ],
 
-    // How a token proves an identity, see the README's Authentication section. A strategy is a TokenValidator: add yours here.
-    'token_validation' => [
-        'strategy' => env('AUTH_TOKEN_VALIDATION_STRATEGY', 'jwt'),
-        'strategies' => [
-            'jwt' => JwtTokens::class,
-            'rpc' => RpcTokens::class,
-            'gateway' => GatewayTokens::class,
-        ],
+    // The gateway checks the client's token and sends X-Identity, its claims signed with this secret: a module reads only that header.
+    'gateway' => [
+        'header' => 'X-Identity',
+        'secret' => env('AUTH_GATEWAY_SECRET'),
+    ],
+
+    // How the gateway checks the client's token, and so what iam issues: `signature`, a JWT checked with iam's
+    // public key; `issuer`, an opaque token iam is asked about on every request. The same for iam and the gateway.
+    'tokens' => [
+        'validation' => env('AUTH_TOKEN_VALIDATION_STRATEGY', 'signature'),
+        // Seconds a token lives. Under `signature` it is also the longest a logout takes to apply: see the README.
+        'ttl' => (int) env('AUTH_TOKEN_TTL', 3600),
+        // `signature` only: seconds a refresh token lives, one per device, replaced on each use; 0 issues none.
+        'refresh_ttl' => (int) env('AUTH_REFRESH_TOKEN_TTL', 0),
         'jwt' => [
-            // The PEM itself, or else the file `php artisan auth:jwt-keys` writes.
-            'public_key' => env('AUTH_JWT_PUBLIC_KEY') ?: (is_file($public = storage_path('jwt-public.key')) ? file_get_contents($public) : null),
-            'private_key' => env('AUTH_JWT_PRIVATE_KEY') ?: (is_file($private = storage_path('jwt-private.key')) ? file_get_contents($private) : null),
-            'ttl' => (int) env('AUTH_JWT_TTL', 3600),
-        ],
-        'gateway' => [
-            'header' => 'X-Identity',
-            'secret' => env('AUTH_GATEWAY_SECRET'),
+            // Where `php artisan auth:jwt-keys` writes the pair; the gateway reads the public one there too.
+            'path' => $keys = env('AUTH_JWT_KEYS_PATH') ?: storage_path(),
+            // The PEM itself, or else the file in `path`.
+            'public_key' => env('AUTH_JWT_PUBLIC_KEY') ?: (is_file($public = "{$keys}/jwt-public.key") ? file_get_contents($public) : null),
+            'private_key' => env('AUTH_JWT_PRIVATE_KEY') ?: (is_file($private = "{$keys}/jwt-private.key") ? file_get_contents($private) : null),
         ],
     ],
 

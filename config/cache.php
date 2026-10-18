@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 return [
 
     /*
@@ -118,7 +116,8 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+    // The same in every service: the RPC answers cached by one are forgotten by another.
+    'prefix' => env('CACHE_PREFIX', 'cache:'),
 
     /*
     |--------------------------------------------------------------------------

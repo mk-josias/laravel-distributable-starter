@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Pdo\Mysql;
 
 return [
@@ -18,6 +17,9 @@ return [
     */
 
     'default' => env('DB_CONNECTION', 'sqlite'),
+
+    // The connection migrations and DDL run on; null: the default one. A module names its own, as it names its `default`.
+    'owner' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -149,7 +151,8 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            // The same in every service: they share the keys of the stream and of the RPC cache.
+            'prefix' => env('REDIS_PREFIX', 'database:'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

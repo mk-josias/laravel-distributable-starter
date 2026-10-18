@@ -7,24 +7,33 @@ namespace Apps\Iam\Actions;
 use Apps\Iam\Models\User;
 use Firebase\JWT\JWT;
 use Foundation\Common\Contracts\Action;
-use Illuminate\Support\Str;
 
-/** rpc: an opaque token only iam can read. jwt and gateway: a JWT anyone with iam's public key can verify. */
+/**
+ * auth.tokens.validation: `signature`, a JWT the gateway checks with iam's public key, with a refresh token when
+ * auth.tokens.refresh_ttl is set; `issuer`, an opaque token only iam reads. One session per device: a new one replaces it.
+ */
 final readonly class IssueToken implements Action
 {
-    public function execute(User $user): string
+    /** @return array{token: string, expires_at: int, refresh_token?: string} */
+    public function execute(User $user, string $device): array
     {
-        if (config('auth.token_validation.strategy') !== 'rpc') {
-            return JWT::encode([
-                'sub' => (string) $user->getKey(),
-                'iat' => time(),
-                'exp' => time() + (int) config('auth.token_validation.jwt.ttl'),
-            ], (string) config('auth.token_validation.jwt.private_key'), 'RS256');
+        $user->tokens()->whereIn('name', [$device, "refresh:{$device}"])->delete();
+
+        if (config('auth.tokens.validation') === 'issuer') {
+            $expiresAt = now()->addSeconds((int) config('auth.tokens.ttl'));
+
+            return ['token' => $user->createToken($device, ['access'], $expiresAt)->plainTextToken, 'expires_at' => $expiresAt->getTimestamp()];
         }
 
-        $token = Str::random(40);
-        $user->forceFill(['api_token' => hash('sha256', $token)])->save();
+        $expiresAt = time() + (int) config('auth.tokens.ttl');
+        $session = [
+            'token' => JWT::encode(['sub' => (string) $user->getKey(), 'iat' => time(), 'exp' => $expiresAt], (string) config('auth.tokens.jwt.private_key'), 'RS256'),
+            'expires_at' => $expiresAt,
+        ];
+        $refreshTtl = (int) config('auth.tokens.refresh_ttl');
 
-        return $token;
+        return $refreshTtl > 0
+            ? [...$session, 'refresh_token' => $user->createToken("refresh:{$device}", ['refresh'], now()->addSeconds($refreshTtl))->plainTextToken]
+            : $session;
     }
 }

@@ -74,7 +74,7 @@ class DatasetsTest extends ModuleTestCase
         $this->getJson('/analytics/api/v1/datasets', $this->user(2, 'grace', [AnalyticsPermission::ReadDatasets->value]))->assertOk();
     }
 
-    /** @return array{Authorization: string} */
+    /** @return array{X-Identity: string} */
     private function signedUpAt(int $id, string $name, string $at): array
     {
         $now = now();

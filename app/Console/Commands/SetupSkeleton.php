@@ -10,14 +10,14 @@ use Illuminate\Support\Str;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
 
-/** Run once by create-project: removes the example modules you don't keep, and sets the token strategy. */
+/** Run once by create-project: removes the example modules you don't keep, and sets the tokens iam issues. */
 final class SetupSkeleton extends Command
 {
     protected $signature = 'skeleton:setup
         {--remove=* : An example module to remove: analytics, notifications}
-        {--strategy= : jwt, rpc or gateway}';
+        {--strategy= : signature or issuer}';
 
-    protected $description = 'Choose the example modules to keep and the token validation strategy';
+    protected $description = 'Choose the example modules to keep and how the gateway validates a token';
 
     /**
      * iam stays: the other modules, authentication and permissions rely on it.
@@ -26,15 +26,26 @@ final class SetupSkeleton extends Command
      */
     private const array REMOVABLE = [
         'analytics' => [
-            'tests' => ['ModulesTest'],
-            'lines' => ['config/auth.php' => [
-                "use Foundation\\Analytics\\Enums\\AnalyticsPermission;\n",
-                "        AnalyticsPermission::class,\n",
-            ]],
+            'tests' => ['DatabaseIsolationTest', 'EventsAcrossModulesTest', 'AuthenticationAcrossModulesTest', 'ContractsAcrossModulesTest'],
+            'lines' => [
+                'config/auth.php' => [
+                    "use Foundation\\Analytics\\Enums\\AnalyticsPermission;\n",
+                    "        AnalyticsPermission::class,\n",
+                ],
+                'gateway/traefik/dynamic/routers.yml' => [
+                    "    analytics:\n      rule: PathPrefix(`/analytics/api`)\n      middlewares: [auth]\n      service: analytics\n",
+                    "    analytics:\n      loadBalancer:\n        servers: [{ url: \"http://analytics:8000\" }]\n",
+                ],
+            ],
         ],
         'notifications' => [
             'tests' => [],
-            'lines' => [],
+            'lines' => [
+                'gateway/traefik/dynamic/routers.yml' => [
+                    "    notifications:\n      rule: PathPrefix(`/notifications/api`)\n      middlewares: [auth]\n      service: notifications\n",
+                    "    notifications:\n      loadBalancer:\n        servers: [{ url: \"http://notifications:8000\" }]\n",
+                ],
+            ],
         ],
     ];
 
@@ -54,18 +65,19 @@ final class SetupSkeleton extends Command
         }
 
         $strategy = (string) ($this->option('strategy') ?? select(
-            label: 'How do the modules validate a token? See the README, "Choosing a strategy".',
-            options: ['jwt' => 'jwt: a JWT checked with iam\'s public key', 'rpc' => 'rpc: an opaque token iam looks up', 'gateway' => 'gateway: an X-Identity header set by your gateway'],
-            default: 'jwt',
+            label: 'How does the gateway validate a token? See the README, "Authentication".',
+            options: ['signature' => 'signature: a JWT, checked with iam\'s public key', 'issuer' => 'issuer: an opaque token, iam is asked on every request'],
+            default: 'signature',
         ));
 
         $this->setEnv('AUTH_TOKEN_VALIDATION_STRATEGY', $strategy);
 
-        if ($strategy === 'gateway' && (string) config('auth.token_validation.gateway.secret') === '') {
+        // The gateway signs X-Identity with it, the modules check it.
+        if ((string) config('auth.gateway.secret') === '') {
             $this->setEnv('AUTH_GATEWAY_SECRET', Str::random(64));
         }
 
-        $this->components->info("Token strategy: {$strategy}.");
+        $this->components->info("Token validation strategy: {$strategy}.");
         $this->removeItself();
 
         return self::SUCCESS;
@@ -126,7 +138,7 @@ final class SetupSkeleton extends Command
         $this->call('modules:delete', ['name' => $module, '--force' => true]);
 
         foreach (self::REMOVABLE[$module]['tests'] as $test) {
-            @unlink(base_path("tests/Feature/{$test}.php"));
+            @unlink(base_path("tests/Integration/{$test}.php"));
         }
 
         foreach (self::REMOVABLE[$module]['lines'] as $file => $lines) {
@@ -143,6 +155,7 @@ final class SetupSkeleton extends Command
         foreach (['docker-compose.yml', 'docker-compose.mono.yml'] as $file) {
             $contents = (string) file_get_contents(base_path($file));
             $contents = (string) preg_replace("/^  {$module}:\n(?:(?:    .*)?\n)*/m", '', $contents);
+            $contents = (string) preg_replace("/^(\s+aliases: \[.*), {$module}(?=[,\]])/m", '$1', $contents);
             $contents = (string) preg_replace_callback(
                 '/^(\s+MODULE_DATABASES: ")([^"]*)"/m',
                 fn (array $match): string => $match[1].implode(str_contains($match[2], ',') ? ',' : ' ', array_values(array_diff(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Integration;
 
 use Distributable\Testing\Boundaries;
 use Tests\TestCase;

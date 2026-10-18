@@ -57,7 +57,7 @@ class InboxTest extends ModuleTestCase
         $this->getJson('/notifications/api/v1/notifications', $headers)->assertOk()->assertJsonCount(1, 'data');
     }
 
-    /** @return array{Authorization: string} */
+    /** @return array{X-Identity: string} */
     private function registered(int $id, string $name): array
     {
         $headers = $this->user($id, $name);

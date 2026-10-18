@@ -7,7 +7,10 @@ namespace Apps\Iam\Models;
 use Foundation\Common\Auth\IsPrincipal;
 use Foundation\Common\Auth\Principal;
 use Foundation\Common\Database\Searchable;
+use Foundation\Iam\Services\IamRpcService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\HasApiTokens;
 use Microservices\Contracts\Shadows\Shadowed;
 use Microservices\Traits\ShadowSource;
 use Spatie\Permission\Traits\HasRoles;
@@ -17,10 +20,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $name
  * @property string $email
  * @property string $password
- * @property string|null $api_token
  */
 final class User extends Model implements Principal, Shadowed
 {
+    use HasApiTokens;
     use HasRoles;
     use IsPrincipal;
     use Searchable;
@@ -30,12 +33,21 @@ final class User extends Model implements Principal, Shadowed
 
     protected string $guard_name = 'web';
 
-    protected $fillable = ['name', 'email', 'password', 'api_token'];
+    protected $fillable = ['name', 'email', 'password'];
 
-    protected $hidden = ['password', 'api_token'];
+    protected $hidden = ['password'];
 
     /** @var list<string> the fields the other modules' copies carry */
     protected array $shadowed = ['name', 'email'];
+
+    /** Once a change is committed, the cached answer of findUser() is forgotten: callers and the gateway read the new one. */
+    protected static function booted(): void
+    {
+        $forget = static fn (self $user) => DB::afterCommit(static fn () => app(IamRpcService::class)->forgetUser($user->id));
+
+        self::saved($forget);
+        self::deleted($forget);
+    }
 
     /** @return array<string, string> */
     protected function casts(): array

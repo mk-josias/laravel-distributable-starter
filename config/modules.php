@@ -20,6 +20,13 @@ return [
         'notifications' => [],
     ],
 
+    // The URL of a module's routes file: {module} its name, {name} the file's (routes/api.php → api).
+    // A module sets its own in `declared`: 'iam' => ['prefix' => 'identity/{name}']. Change one, and
+    // change its rules in gateway/traefik/dynamic/routers.yml too: Traefik routes by these paths.
+    'routes' => [
+        'prefix' => '{module}/{name}',
+    ],
+
     // Modules booted by THIS process: '*' = all, or a comma-separated list.
     'runs' => env('RUN_MODULES', '*'),
 

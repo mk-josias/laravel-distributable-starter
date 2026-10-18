@@ -44,7 +44,6 @@ ENV RUN_MODULES=${RUN_MODULES} \
     OCTANE_SERVER=swoole \
     WITH_HTTP=true \
     WITH_WORKER=false \
-    WITH_PUBLISHER=false \
     WITH_SCHEDULER=false \
     WITH_CONSUMERS=false
 

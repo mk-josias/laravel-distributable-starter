@@ -9,7 +9,7 @@ use Apps\Analytics\Models\Mail;
 use Apps\Analytics\Models\Signup;
 use Apps\Analytics\Support\MonthlyPartitions;
 use DateTimeInterface;
-use Distributable\Traits\ResolvesModule;
+use Distributable\Services\Modules\ModuleContext;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -22,8 +22,6 @@ use Illuminate\Support\Facades\DB;
  */
 final class ComputeDatasets extends Command
 {
-    use ResolvesModule;
-
     protected $signature = 'analytics:compute
         {--date= : A day to (re)compute}
         {--from= : First day of a range, to catch up on history}
@@ -31,12 +29,13 @@ final class ComputeDatasets extends Command
 
     protected $description = 'Rebuild the hourly datasets of yesterday and today, of a day, or of a range, from the journals';
 
-    public function handle(MonthlyPartitions $partitions): int
+    public function handle(MonthlyPartitions $partitions, ModuleContext $context): int
     {
         $buckets = 0;
+        $owner = DB::connection($context->current()?->ownerConnection());
 
         foreach ($this->days() as $day) {
-            $partitions->ensure($day, DB::connection($this->module->ownerConnection()));
+            $partitions->ensure($day, $owner);
             $buckets += $this->compute($day);
         }
 
