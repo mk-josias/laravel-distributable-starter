@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Foundation\Iam\Shadows;
 
-use Distributable\Contracts\Shadows\PublishesMigrations;
 use Distributable\Models\ShadowModel;
 use Foundation\Common\Auth\IsPrincipal;
 use Foundation\Common\Auth\Principal;
@@ -14,7 +13,7 @@ use Foundation\Common\Auth\Principal;
  * @property string $name
  * @property string $email
  */
-class UserShadow extends ShadowModel implements Principal, PublishesMigrations
+class UserShadow extends ShadowModel implements Principal
 {
     use IsPrincipal;
 
