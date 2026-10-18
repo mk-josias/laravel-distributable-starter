@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fb733b3027e434036dfffef06250e76",
+    "content-hash": "d67af8d0b3d1de5e54c736a5973fc6ab",
     "packages": [
         {
             "name": "brick/math",
@@ -2660,11 +2660,11 @@
         },
         {
             "name": "mk-josias/laravel-distributable",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "e2850fc891ff6b39f6f4471689bbfe228ac7becb"
+                "reference": "02511fdc221949e3351e6958320847a8c1058374"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
@@ -2715,11 +2715,11 @@
         },
         {
             "name": "mk-josias/laravel-distributable-rpc-http",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/rpc-http",
-                "reference": "50846b2751d2f129a2a471b943476c65716354d2"
+                "reference": "99e21d13dc41b73b3754d9d164f09f0fe8467be2"
             },
             "require": {
                 "mk-josias/laravel-distributable": "self.version",
@@ -2762,11 +2762,11 @@
         },
         {
             "name": "mk-josias/laravel-distributable-stream-redis",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/stream-redis",
-                "reference": "2a3e5b9894f7cc3010313e5ec38d7a9f16cbe005"
+                "reference": "29666e3884d73b6f8870036f996d25352c3940b6"
             },
             "require": {
                 "mk-josias/laravel-distributable": "self.version",
