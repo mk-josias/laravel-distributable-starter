@@ -3,6 +3,7 @@
 use Foundation\Common\Contracts\RendersApiEnvelope;
 use Foundation\Common\Http\ApiErrorCode;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // The events kept in a module's database because their sending after the commit failed.
+        if (config('distributable.events.reliable_publish')) {
+            $schedule->command('stream:republish')->everyMinute()->withoutOverlapping();
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
