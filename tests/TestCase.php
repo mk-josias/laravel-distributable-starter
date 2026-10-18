@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Distributable\Services\Modules\ModuleRegistry;
+use Distributable\Services\ModuleRegistry;
 use Distributable\Testing\ModuleAware;
 use Foundation\Iam\Auth\TrustedIdentity;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
