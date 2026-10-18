@@ -127,7 +127,6 @@
                 "symlink": true,
                 "versions": {
                     "mk-josias/laravel-distributable-modules": "0.2.0",
-                    "mk-josias/laravel-microservices": "0.2.0",
                     "mk-josias/laravel-microservices-rpc-http": "0.2.0",
                     "mk-josias/laravel-microservices-stream-redis": "0.2.0",
                     "mk-josias/laravel-microservices-stream-queue": "0.2.0"

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Apps\Analytics\Support;
+namespace Apps\Analytics\Services;
 
 use Illuminate\Database\Connection;
 use Illuminate\Support\Carbon;

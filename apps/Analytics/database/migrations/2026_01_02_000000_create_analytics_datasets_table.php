@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Apps\Analytics\Support\MonthlyPartitions;
+use Apps\Analytics\Services\MonthlyPartitions;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Foundation\Iam\Shadows;
 
-use Distributable\Contracts\PublishesMigrations;
+use Distributable\Contracts\Shadows\PublishesMigrations;
 use Distributable\Models\ShadowModel;
 use Foundation\Common\Auth\IsPrincipal;
 use Foundation\Common\Auth\Principal;

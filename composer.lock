@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2ec3b92dabcb83ac45fe040080c24a1",
+    "content-hash": "d48d0a3970970b0a9b3d91ef1b86c3fc",
     "packages": [
         {
             "name": "brick/math",
@@ -2664,21 +2664,23 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/core",
-                "reference": "c886518f1d505743b7f1498b299d5e8fb2210cd7"
+                "reference": "bfc0e2d5e758641178f8700f6d6a9e8732161e98"
             },
             "require": {
                 "laravel/framework": "^12.0 || ^13.0",
-                "mk-josias/laravel-microservices": "^0.2",
                 "php": "^8.4"
             },
             "suggest": {
                 "laravel/octane": "High-throughput application server; the kernel also runs under plain FPM",
-                "mk-josias/laravel-microservices-rpc-http": "Calls to a module running in another process, over signed HTTP"
+                "mk-josias/laravel-microservices-rpc-http": "Calls to a module running in another process, over signed HTTP",
+                "mk-josias/laravel-microservices-stream-queue": "The queue events driver, for a stack without Redis",
+                "mk-josias/laravel-microservices-stream-redis": "The redis events driver, on Redis Streams"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
+                        "Distributable\\Providers\\MicroservicesServiceProvider",
                         "Distributable\\Providers\\DistributableServiceProvider"
                     ]
                 }
@@ -2686,7 +2688,10 @@
             "autoload": {
                 "psr-4": {
                     "Distributable\\": "src/"
-                }
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
             },
             "license": [
                 "MIT"
@@ -2714,71 +2719,15 @@
             }
         },
         {
-            "name": "mk-josias/laravel-microservices",
-            "version": "0.2.0",
-            "dist": {
-                "type": "path",
-                "url": "../packages/microservices",
-                "reference": "f9aca30e6baf11aab83640a028b05094f924b3d2"
-            },
-            "require": {
-                "laravel/framework": "^12.0 || ^13.0",
-                "php": "^8.4"
-            },
-            "suggest": {
-                "mk-josias/laravel-microservices-rpc-http": "The http RPC driver, signed calls between services",
-                "mk-josias/laravel-microservices-stream-queue": "The queue events driver, for a stack without Redis",
-                "mk-josias/laravel-microservices-stream-redis": "The redis events driver, on Redis Streams"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Distributable\\Providers\\MicroservicesServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Distributable\\": "src/"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Josias Mekontso",
-                    "email": "josiasmekontso.it@gmail.com"
-                }
-            ],
-            "description": "Laravel apps as microservices: signed RPC through contracts, events that can be made reliable, and read-only copies of another service's rows.",
-            "homepage": "https://mk-josias.github.io/laravel-microservices/",
-            "keywords": [
-                "events",
-                "laravel",
-                "microservices",
-                "outbox",
-                "rpc"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "mk-josias/laravel-microservices-rpc-http",
             "version": "0.2.0",
             "dist": {
                 "type": "path",
                 "url": "../packages/rpc-http",
-                "reference": "87185190bf009364fcf27e84bcf9c767fc16e37b"
+                "reference": "defb8f2424473df5b01102763a889653bd5a3008"
             },
             "require": {
-                "mk-josias/laravel-microservices": "self.version",
+                "mk-josias/laravel-distributable-modules": "self.version",
                 "php": "^8.4"
             },
             "type": "library",
@@ -2822,10 +2771,10 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/stream-redis",
-                "reference": "b195ca77c7c22383e1b74e1ca4d9b51e30740101"
+                "reference": "79ad5e779bb4f30bc8df210745d53121b0f9d7d3"
             },
             "require": {
-                "mk-josias/laravel-microservices": "self.version",
+                "mk-josias/laravel-distributable-modules": "self.version",
                 "php": "^8.4"
             },
             "suggest": {
