@@ -249,7 +249,7 @@ request ─► X-Identity ─► Identity ─► PrincipalResolver ─► Princi
 | Interface | Config key | Shipped | To add your own |
 |---|---|---|---|
 | `PrincipalResolver` | `auth.principal_resolver` | `LocalPrincipals`: the user's row in the running module's own database, through `auth.principal`: `UserShadow` in the modules that keep it, `User` in iam, which sets it in its `config/auth.php`. `ClaimsPrincipals`: the user is built from the claims, no row. `RpcPrincipals`: the user iam returns for the id | name your class |
-| `PermissionSource` | `auth.permission_source` | `IamPermissions`: `IamClient::grants()`. `ClaimsPermissions`: the `permissions` claim | name your class |
+| `PermissionSource` | `auth.permission_source` | `RpcPermissions`: `IamClient::grants()`. `ClaimsPermissions`: the `permissions` claim | name your class |
 
 A request is refused (401, Laravel's `AuthenticationException`) when its `X-Identity` is missing,
 expired or not signed with the secret. With `LocalPrincipals` it is also refused while the module
@@ -435,6 +435,7 @@ migrates only the database of the module it runs, so two containers never migrat
 | Role | Variable | Default | Run at most |
 |---|---|---|---|
 | `http` (Octane) | `WITH_HTTP` | `true` | as many as you need |
+| `rpc` (`rpc:serve`, port `DISTRIBUTABLE_RPC_PORT`) | `WITH_RPC` | `false` | as many as you need: the calls between modules, kept off the API's workers |
 | `worker` (`queue:work`) | `WITH_WORKER` | `false` | as many as you need |
 | `reverb` (WebSocket, port 8080) | `WITH_REVERB` | `false` | one per container that pushes: it pushes to its own, on localhost |
 | `scheduler` (supercronic) | `WITH_SCHEDULER` | `false` | one per module set: two would run each task twice |

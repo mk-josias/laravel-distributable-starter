@@ -4,7 +4,8 @@
 # Reverb on 8080 (the live push), which authenticates its channels itself.
 # Three networks: `public` (Traefik and the modules), `internal` (the modules, Postgres, Redis) and
 # `gateway` (iam, Traefik and gateway-cache): Traefik reaches neither Postgres nor Redis.
-# analytics reaches iam over HTTP at iam.svc; both share APP_KEY, which signs those calls.
+# analytics reaches iam over HTTP at iam-rpc, a container of iam's image that only answers the calls
+# between modules (port 8001); both share APP_KEY, which signs those calls.
 # Development values only: in production, set real secrets.
 
 x-env: &env
@@ -26,7 +27,8 @@ x-env: &env
   DISTRIBUTABLE_STREAM_GUARD: "false"
   AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
   AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
-  IAM_HOST: "http://iam.svc:8000"
+  IAM_HOST: "http://iam-rpc:8001"
+  DISTRIBUTABLE_RPC_PORT: "8001"
   OCTANE_WORKERS: "2"
   BROADCAST_CONNECTION: reverb
   REVERB_APP_ID: distributable
@@ -107,6 +109,25 @@ services:
       redis:
         condition: service_healthy
       gateway-cache:
+        condition: service_healthy
+
+  # iam's RPC, from iam's image: the calls between modules never wait behind the API's requests.
+  iam-rpc:
+    <<: *module
+    image: distributable-skeleton:iam
+    environment:
+      <<: *env
+      RUN_MODULES: iam
+      WITH_HTTP: "false"
+      WITH_RPC: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ': </dev/tcp/localhost/8001'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      iam:
         condition: service_healthy
 
   analytics:

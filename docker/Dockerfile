@@ -42,6 +42,7 @@ ARG RUN_MODULES=*
 ENV RUN_MODULES=${RUN_MODULES} \
     OCTANE_SERVER=swoole \
     WITH_HTTP=true \
+    WITH_RPC=false \
     WITH_WORKER=false \
     WITH_SCHEDULER=false \
     WITH_CONSUMERS=false

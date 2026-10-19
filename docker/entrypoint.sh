@@ -21,8 +21,8 @@ if [ "${SYNC_PERMISSIONS:-false}" = "true" ]; then
 fi
 
 # supervisord aborts on any %(ENV_…)s it can't resolve: every switch it reads gets a value here.
-: "${WITH_HTTP:=true}" "${WITH_WORKER:=false}" "${WITH_CONSUMERS:=false}" "${WITH_SCHEDULER:=false}" "${WITH_REVERB:=false}"
+: "${WITH_HTTP:=true}" "${WITH_RPC:=false}" "${WITH_WORKER:=false}" "${WITH_CONSUMERS:=false}" "${WITH_SCHEDULER:=false}" "${WITH_REVERB:=false}"
 : "${OCTANE_WORKERS:=auto}"
-export WITH_HTTP WITH_WORKER WITH_CONSUMERS WITH_SCHEDULER WITH_REVERB OCTANE_WORKERS
+export WITH_HTTP WITH_RPC WITH_WORKER WITH_CONSUMERS WITH_SCHEDULER WITH_REVERB OCTANE_WORKERS
 
 exec supervisord -c /app/docker/supervisord.conf
