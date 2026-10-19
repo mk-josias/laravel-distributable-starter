@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "mk-josias/laravel-distributable-starter",
     "type": "project",
-    "description": "Starter kit for laravel-distributable-modules: a modular monolith deployable as one process or as per-module services.",
+    "description": "Starter kit for laravel-distributable: a modular monolith deployable as one process or as one process per module.",
     "keywords": ["laravel", "modular-monolith", "distributable", "starter-kit"],
     "license": "MIT",
     "require": {
