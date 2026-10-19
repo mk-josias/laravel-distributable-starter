@@ -11,7 +11,9 @@ http:
           redisUser: traefik
           redisPassword: {{ env "REDIS_TRAEFIK_PASSWORD" | quote }}
           userKey: "gateway:user:"
-          iam: http://iam.svc:8000/iam/api/v1/identity
+          # iam's RPC: the message FindUserByToken, signed with the secret every module shares
+          rpc: {{ env "IAM_HOST" | default "http://iam.svc:8000" | quote }}
+          rpcSecret: {{ env "DISTRIBUTABLE_RPC_SECRET" | quote }}
           # iam writes it to the jwt-keys volume (auth:jwt-keys); an outside issuer's goes in publicKey instead
           publicKeyFile: /keys/jwt-public.key
           gatewaySecret: {{ env "AUTH_GATEWAY_SECRET" | quote }}

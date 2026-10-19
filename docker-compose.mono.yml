@@ -26,6 +26,7 @@ x-env: &env
   DISTRIBUTABLE_STREAM_GUARD: "false"
   AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
   AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
+  DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:-rpc-secret}
   BROADCAST_CONNECTION: reverb
   REVERB_APP_ID: distributable
   REVERB_APP_KEY: distributable-key
@@ -42,6 +43,7 @@ services:
     environment:
       AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
       AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
+      DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:-rpc-secret}
       REDIS_TRAEFIK_PASSWORD: ${REDIS_TRAEFIK_PASSWORD:-traefik-password}
     volumes:
       - ./gateway/traefik/traefik.yml:/etc/traefik/traefik.yml:ro

@@ -151,7 +151,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            // The same in every service: they share the keys of the stream and of the RPC cache.
+            // The same in every module: they share the keys of the stream and of the RPC cache.
             'prefix' => env('REDIS_PREFIX', 'database:'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],

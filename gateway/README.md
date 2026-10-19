@@ -26,13 +26,16 @@ Authorization: Bearer <token>, checked by AUTH_TOKEN_VALIDATION_STRATEGY:
   signature → a JWT, checked with the issuer's public key
             → GET gateway:user:{sub}, in gateway-cache
                  present → the token's claims signed here, iam is not called
-                 missing → GET iam /identity, which writes the key and signs
-  issuer    → an opaque token: GET iam /identity, every time, so a revoked token stops at once
+                 missing → iam over RPC (FindUserByToken), which writes the key; the claims are signed here
+  issuer    → an opaque token: iam over RPC (FindUserByToken), every time, so a revoked token stops at once
   none, or refused → 401, the module is never reached
 → the module, with X-Identity: {base64url claims}.{hmac}
 ```
 
 The client's own `X-Identity` is always dropped. The RPC routes (`/{module}/rpc/…`) are not routed.
+
+The gateway holds the RPC secret, which every module shares: it can send any message iam answers. It
+already holds `AUTH_GATEWAY_SECRET`, which signs the identity of any user, so the RPC secret adds little.
 
 ## The routes (`dynamic/routers.yml`)
 
@@ -59,7 +62,7 @@ container. A module added later gets a router and a service of its own, like `an
 | `strategy` | `AUTH_TOKEN_VALIDATION_STRATEGY`, `signature` | `signature` or `issuer`, the same as iam's |
 | `redis`, `redisUser`, `redisPassword` | `gateway-cache:6379`, `traefik`, `REDIS_TRAEFIK_PASSWORD` | where the users are, and as whom |
 | `userKey` | `gateway:user:` | the key iam writes a user under, without the id |
-| `iam` | `http://iam.svc:8000/iam/api/v1/identity` | asked on a miss, and for every token under `issuer` |
+| `rpc`, `rpcSecret` | `IAM_HOST`, `DISTRIBUTABLE_RPC_SECRET` | where iam answers `FindUserByToken`, and the secret every module signs its RPC calls with: asked on a miss, and for every token under `issuer` |
 | `publicKeyFile`, or `publicKey` | `/keys/jwt-public.key` | the issuer's key, under `signature`: iam writes it to the `jwt-keys` volume |
 | `checkUser` | `true` | `false` when the issuer is outside iam: its claims are signed with no lookup |
 | `gatewaySecret` | `AUTH_GATEWAY_SECRET` | the secret the modules check X-Identity with |

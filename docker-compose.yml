@@ -27,6 +27,7 @@ x-env: &env
   DISTRIBUTABLE_STREAM_GUARD: "false"
   AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
   AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
+  DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:-rpc-secret}
   IAM_HOST: "http://iam-rpc:8001"
   DISTRIBUTABLE_RPC_PORT: "8001"
   OCTANE_WORKERS: "2"
@@ -37,6 +38,13 @@ x-env: &env
   REVERB_HOST: localhost   # the Reverb of the container that pushes
   REVERB_PORT: "8080"
   REVERB_SCHEME: http
+
+x-iam: &iam
+  AUTH_JWT_KEYS_PATH: /keys
+  AUTH_GATEWAY_USERS_CONNECTION: gateway
+  GATEWAY_REDIS_HOST: gateway-cache
+  GATEWAY_REDIS_USERNAME: iam
+  GATEWAY_REDIS_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}
 
 x-build: &build
   context: .
@@ -66,6 +74,8 @@ services:
     environment:
       AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
       AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
+      DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:-rpc-secret}
+      IAM_HOST: http://iam-rpc:8001
       REDIS_TRAEFIK_PASSWORD: ${REDIS_TRAEFIK_PASSWORD:-traefik-password}
     volumes:
       - ./gateway/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -86,16 +96,11 @@ services:
         RUN_MODULES: iam
     image: distributable-skeleton:iam
     environment:
-      <<: *env
+      <<: [*env, *iam]
       RUN_MODULES: iam
       WITH_CONSUMERS: "true"
       SYNC_PERMISSIONS: "true"
       WITH_JWT_KEYS: "true"
-      AUTH_JWT_KEYS_PATH: /keys
-      AUTH_GATEWAY_USERS_CONNECTION: gateway
-      GATEWAY_REDIS_HOST: gateway-cache
-      GATEWAY_REDIS_USERNAME: iam
-      GATEWAY_REDIS_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}
     volumes:
       - jwt-keys:/keys
     networks:
@@ -116,10 +121,13 @@ services:
     <<: *module
     image: distributable-skeleton:iam
     environment:
-      <<: *env
+      <<: [*env, *iam]
       RUN_MODULES: iam
       WITH_HTTP: "false"
       WITH_RPC: "true"
+    volumes:
+      - jwt-keys:/keys:ro
+    networks: [public, internal, gateway]
     healthcheck:
       test: ["CMD-SHELL", "bash -c ': </dev/tcp/localhost/8001'"]
       interval: 10s
@@ -128,6 +136,8 @@ services:
       start_period: 30s
     depends_on:
       iam:
+        condition: service_healthy
+      gateway-cache:
         condition: service_healthy
 
   analytics:

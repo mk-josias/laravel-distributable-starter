@@ -5,6 +5,7 @@ summary: Authenticates each request once at the gateway and sends the module the
 
 testData:
   redis: redis:6379
-  iam: http://iam.svc:8000/iam/api/v1/identity
+  rpc: http://iam.svc:8000
+  rpcSecret: ""
   publicKey: ""
   gatewaySecret: ""

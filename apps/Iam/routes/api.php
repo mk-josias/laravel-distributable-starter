@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Apps\Iam\Http\Controllers\Api\AuthController;
-use Apps\Iam\Http\Controllers\Api\IdentityController;
 use Foundation\Common\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +17,4 @@ Route::prefix('v1')->group(function (): void {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('logout-all', [AuthController::class, 'logoutAll']);
     });
-
-    Route::get('identity', IdentityController::class);
 });

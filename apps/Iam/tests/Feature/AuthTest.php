@@ -6,6 +6,7 @@ use Apps\Iam\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Foundation\Iam\Auth\TrustedIdentity;
+use Foundation\Iam\Services\IamClient;
 use Illuminate\Support\Facades\DB;
 use Tests\ModuleTestCase;
 
@@ -80,7 +81,7 @@ class AuthTest extends ModuleTestCase
 
         $this->assertSame('RS256', json_decode(base64_decode($header), true)['alg']);
         $this->assertSame((string) User::query()->value('id'), $claims->sub);
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$header}.{$payload}.forged"])->assertUnauthorized();
+        $this->assertFalse($this->opens("{$header}.{$payload}.forged"));
     }
 
     public function test_under_the_issuer_strategy_a_logout_stops_the_token_at_once(): void
@@ -93,7 +94,7 @@ class AuthTest extends ModuleTestCase
 
         $this->postJson('/iam/api/v1/logout', [], $this->throughGateway($token))->assertNoContent();
 
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$token}"])->assertUnauthorized();
+        $this->assertFalse($this->opens($token));
     }
 
     public function test_registering_gives_no_token_logging_in_does(): void
@@ -111,9 +112,9 @@ class AuthTest extends ModuleTestCase
         $second = $this->login(device: 'phone');
         $laptop = $this->login(device: 'laptop');
 
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$first}"])->assertUnauthorized();
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$second}"])->assertNoContent();
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$laptop}"])->assertNoContent();
+        $this->assertFalse($this->opens($first));
+        $this->assertTrue($this->opens($second));
+        $this->assertTrue($this->opens($laptop));
     }
 
     public function test_logging_out_of_every_device_ends_every_session(): void
@@ -124,8 +125,8 @@ class AuthTest extends ModuleTestCase
 
         $this->postJson('/iam/api/v1/logout-all', [], $this->throughGateway($phone))->assertNoContent();
 
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$phone}"])->assertUnauthorized();
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$laptop}"])->assertUnauthorized();
+        $this->assertFalse($this->opens($phone));
+        $this->assertFalse($this->opens($laptop));
     }
 
     public function test_an_expired_token_opens_nothing(): void
@@ -135,7 +136,7 @@ class AuthTest extends ModuleTestCase
 
         $this->travel((int) config('auth.tokens.ttl') + 1)->seconds();
 
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$token}"])->assertUnauthorized();
+        $this->assertFalse($this->opens($token));
     }
 
     public function test_a_refresh_token_gives_a_new_session_once_and_never_opens_a_request(): void
@@ -147,7 +148,7 @@ class AuthTest extends ModuleTestCase
             ->assertCreated()->assertJsonStructure(['data' => ['token', 'expires_at', 'refresh_token']]);
 
         $this->postJson('/iam/api/v1/refresh', ['refresh_token' => $refreshToken])->assertUnauthorized();
-        $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$refreshToken}"])->assertUnauthorized();
+        $this->assertFalse($this->opens($refreshToken));
     }
 
     public function test_a_module_trusts_only_an_identity_signed_with_the_shared_secret_and_not_expired(): void
@@ -159,19 +160,14 @@ class AuthTest extends ModuleTestCase
         $this->getJson('/iam/api/v1/me', ['X-Identity' => TrustedIdentity::sign(['sub' => $id], time() - 1, self::GATEWAY_SECRET)])->assertUnauthorized();
     }
 
-    public function test_identity_signs_the_claims_of_the_token_for_the_modules(): void
-    {
-        $identity = (string) $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$this->login()}"])->assertNoContent()->headers->get('X-Identity');
-        $claims = (new TrustedIdentity(self::GATEWAY_SECRET))->validate($identity)?->claims;
-
-        $this->assertSame('1', $claims['sub'] ?? null);
-        $this->get('/iam/api/v1/identity', ['Authorization' => 'Bearer forged'])->assertUnauthorized();
-        $this->get('/iam/api/v1/identity')->assertUnauthorized();
-    }
-
     public function test_a_password_shorter_than_eight_characters_is_refused_at_registration(): void
     {
         $this->register(name: 'Grace', email: 'grace@example.com', password: 'short')
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
+    }
+
+    private function opens(string $token): bool
+    {
+        return app(IamClient::class)->findUserByToken($token) !== null;
     }
 }

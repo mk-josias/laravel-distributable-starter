@@ -3,14 +3,17 @@ package gatewayauth
 import (
 	"context"
 	"crypto"
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -29,15 +32,32 @@ type gateway struct {
 	asked    *atomic.Int32
 }
 
-// newGateway serves the middleware against a fake Redis holding keys and a fake iam answering with status.
+// signedBy tells whether an RPC call carries the signature Distributable\RpcHttp\RpcSignature checks.
+func signedBy(secret string, req *http.Request, body []byte) bool {
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(strings.Join([]string{req.Header.Get("X-Rpc-Timestamp"), req.Header.Get("X-Rpc-Nonce"), req.URL.Path, string(body), req.Header.Get("X-Rpc-Context")}, "\n")))
+
+	return req.Header.Get("X-Rpc-Signature") == hex.EncodeToString(mac.Sum(nil))
+}
+
+// newGateway serves the middleware against a fake Redis holding keys and a fake iam answering the message
+// FindUserByToken: the user when status is 204, null (404) otherwise, and a refusal to any call badly signed.
 func newGateway(t *testing.T, keys map[string]string, status int, configure ...func(*Config)) gateway {
 	var asked atomic.Int32
-	iam := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
+	iam := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		asked.Add(1)
-		if status == http.StatusNoContent {
-			rw.Header().Set("X-Identity", "42.123.signed-by-iam")
+		body, _ := io.ReadAll(req.Body)
+
+		if req.URL.Path != "/iam/rpc/1/find-user-by-token" || !signedBy("rpc-secret", req, body) {
+			rw.WriteHeader(http.StatusForbidden)
+			return
 		}
-		rw.WriteHeader(status)
+		if status != http.StatusNoContent {
+			rw.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		rw.Write([]byte(`{"id":42,"name":"Ada"}`))
 	}))
 	t.Cleanup(iam.Close)
 
@@ -47,7 +67,8 @@ func newGateway(t *testing.T, keys map[string]string, status int, configure ...f
 	config := CreateConfig()
 	config.Redis = redistest.Serve(t, keys)
 	config.RedisUser = "traefik"
-	config.Iam = iam.URL
+	config.Rpc = iam.URL
+	config.RpcSecret = "rpc-secret"
 	config.GatewaySecret = "secret"
 	config.PublicKey = string(pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: der}))
 	for _, change := range configure {
@@ -127,11 +148,11 @@ func TestItReadsThePublicKeyFromAFile(t *testing.T) {
 	}
 }
 
-func TestAMissAsksIamAndSendsItsIdentity(t *testing.T) {
+func TestAMissAsksIamAndSignsTheClaimsOfTheTokenItself(t *testing.T) {
 	g := newGateway(t, map[string]string{}, http.StatusNoContent)
 
-	if code := g.serve(g.jwt("42", time.Now().Unix()+60)); code != http.StatusOK || *g.identity != "42.123.signed-by-iam" {
-		t.Fatalf("status %d, identity %q", code, *g.identity)
+	if code := g.serve(g.jwt("42", time.Now().Unix()+60)); code != http.StatusOK || g.claims()["sub"] != "42" || g.asked.Load() != 1 {
+		t.Fatalf("status %d, claims %v, iam asked %d times", code, g.claims(), g.asked.Load())
 	}
 }
 
@@ -141,8 +162,8 @@ func TestUnderTheIssuerStrategyEveryTokenIsCheckedByIamWithNoKey(t *testing.T) {
 		config.PublicKey = ""
 	})
 
-	if code := g.serve("9f3c0e2a"); code != http.StatusOK || g.asked.Load() != 1 {
-		t.Fatalf("status %d, iam asked %d times", code, g.asked.Load())
+	if code := g.serve("9f3c0e2a"); code != http.StatusOK || g.asked.Load() != 1 || g.claims()["sub"] != float64(42) || g.claims()["name"] != "Ada" {
+		t.Fatalf("status %d, claims %v, iam asked %d times", code, g.claims(), g.asked.Load())
 	}
 }
 

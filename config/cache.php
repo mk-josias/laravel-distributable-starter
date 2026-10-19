@@ -116,7 +116,7 @@ return [
     |
     */
 
-    // The same in every service: the RPC answers cached by one are forgotten by another.
+    // The same in every module: the RPC answers cached by one are forgotten by another.
     'prefix' => env('CACHE_PREFIX', 'cache:'),
 
     /*

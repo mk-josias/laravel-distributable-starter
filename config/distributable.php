@@ -37,10 +37,10 @@ return [
         'namespace' => 'Apps',
     ],
 
-    // What module iam shares is {path}/Iam, under {namespace}\Iam\.
+    // Where what the modules share lives. The package checks it (no module's code in it, none of it
+    // entering a module) and never loads it: map it in composer.json like your own code.
     'foundation' => [
         'path' => 'foundation',
-        'namespace' => 'Foundation',
     ],
 
     // Path answering which modules this process runs (e.g. '/'), or null to register nothing.

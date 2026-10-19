@@ -5,6 +5,7 @@ namespace Tests;
 use Distributable\Services\ModuleRegistry;
 use Distributable\Testing\ModuleAware;
 use Foundation\Iam\Auth\TrustedIdentity;
+use Foundation\Iam\Services\IamClient;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
@@ -99,12 +100,14 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * What the gateway does with a client's token: asks iam's identity route, then sends its X-Identity on.
+     * What the gateway does with a client's token: asks iam over RPC who holds it, then sends its X-Identity on.
      *
      * @return array{X-Identity: string}
      */
     protected function throughGateway(string $token): array
     {
-        return ['X-Identity' => (string) $this->get('/iam/api/v1/identity', ['Authorization' => "Bearer {$token}"])->headers->get('X-Identity')];
+        $user = app(IamClient::class)->findUserByToken($token);
+
+        return $user === null ? ['X-Identity' => ''] : $this->identity($user->id, ['name' => $user->name]);
     }
 }
