@@ -42,6 +42,7 @@ class GatewayCacheTest extends ModuleTestCase
     private function gatewayRedis(): MockInterface
     {
         config()->set('auth.gateway.users_connection', 'gateway');
+        /** @var MockInterface&Connection $connection */
         $connection = Mockery::mock(Connection::class);
         Redis::shouldReceive('connection')->with('gateway')->andReturn($connection);
 

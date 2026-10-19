@@ -55,11 +55,21 @@ final class DatasetRepository extends EloquentRepository
     /** One figure: a measure folded over the period, 0 when no row falls in it. */
     public function measure(DatasetMeasure $measure, ?Carbon $from = null, ?Carbon $to = null): int
     {
-        $period = fn (Builder $query) => $query
-            ->when($from, fn (Builder $query, Carbon $from) => $query->startingAt($from))
-            ->when($to, fn (Builder $query, Carbon $to) => $query->endingAt($to));
+        $period = fn (Builder $query) => $this->within($query, $from, $to);
 
         return (int) ($this->read(new ReadMetricsDto(DatasetGroup::None, [$measure]), $period)[0][$measure->value] ?? 0);
+    }
+
+    /** @param Builder<Dataset> $query */
+    private function within(Builder $query, ?Carbon $from, ?Carbon $to): void
+    {
+        if ($from !== null) {
+            $query->startingAt($from);
+        }
+
+        if ($to !== null) {
+            $query->endingAt($to);
+        }
     }
 
     /**

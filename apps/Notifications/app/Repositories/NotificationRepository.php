@@ -57,6 +57,12 @@ final class NotificationRepository extends EloquentRepository
     /** @return Closure(Builder<Notification>): void */
     private function addressedTo(int $recipientId): Closure
     {
-        return fn (Builder $query) => $query->addressedTo($recipientId)->with('recipient');
+        return fn (Builder $query) => $this->scopedTo($query, $recipientId);
+    }
+
+    /** @param Builder<Notification> $query */
+    private function scopedTo(Builder $query, int $recipientId): void
+    {
+        $query->addressedTo($recipientId)->with('recipient');
     }
 }

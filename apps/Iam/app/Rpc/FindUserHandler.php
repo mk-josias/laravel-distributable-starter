@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Apps\Iam\Rpc;
 
 use Apps\Iam\Repositories\UserRepository;
+use Distributable\Contracts\Rpc\Handler;
 use Foundation\Iam\Rpc\FindUser;
 
-final class FindUserHandler
+/** @implements Handler<FindUser> */
+final class FindUserHandler implements Handler
 {
     public function __construct(private UserRepository $users) {}
 
