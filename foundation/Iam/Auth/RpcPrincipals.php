@@ -19,6 +19,6 @@ final readonly class RpcPrincipals implements PrincipalResolver
     {
         $user = $this->iam->findUser((int) $identity->id);
 
-        return $user === null ? null : new ClaimsPrincipal(new Identity($user['id'], $user));
+        return $user === null ? null : new ClaimsPrincipal(new Identity($user->id, $user->toArray()));
     }
 }

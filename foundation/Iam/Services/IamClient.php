@@ -5,30 +5,29 @@ declare(strict_types=1);
 namespace Foundation\Iam\Services;
 
 use Distributable\Services\Rpc\RpcClient;
+use Foundation\Iam\Data\UserData;
 use Foundation\Iam\Rpc\FindUser;
 use Foundation\Iam\Rpc\FindUserByToken;
 use Foundation\Iam\Rpc\Grants;
 
 final class IamClient extends RpcClient
 {
-    /** @return array{id: int, name: string}|null */
-    public function findUser(int $id): ?array
+    public function findUser(int $id): ?UserData
     {
         return $this->readThrough(
             self::userKey($id),
             self::DEFAULT_TTL,
             fn (): mixed => $this->send(new FindUser($id)),
-            fn (array $raw): array => ['id' => (int) $raw['id'], 'name' => (string) $raw['name']],
+            fn (array $raw): UserData => UserData::from($raw),
         );
     }
 
     /** Not cached: a token is checked on every request, and a revoked one must stop working at once. */
-    /** @return array{id: int, name: string}|null */
-    public function findUserByToken(string $token): ?array
+    public function findUserByToken(string $token): ?UserData
     {
         $raw = $this->send(new FindUserByToken($token));
 
-        return is_array($raw) ? ['id' => (int) $raw['id'], 'name' => (string) $raw['name']] : null;
+        return is_array($raw) ? UserData::from($raw) : null;
     }
 
     /** @return list<string> */

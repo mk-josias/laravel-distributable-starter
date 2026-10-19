@@ -6,6 +6,7 @@ namespace Apps\Iam\Rpc;
 
 use Apps\Iam\Repositories\UserRepository;
 use Distributable\Contracts\Rpc\Handler;
+use Foundation\Iam\Data\UserData;
 use Foundation\Iam\Rpc\FindUserByToken;
 
 /** @implements Handler<FindUserByToken> */
@@ -13,11 +14,10 @@ final class FindUserByTokenHandler implements Handler
 {
     public function __construct(private UserRepository $users) {}
 
-    /** @return array{id: int, name: string}|null */
-    public function handle(FindUserByToken $message): ?array
+    public function handle(FindUserByToken $message): ?UserData
     {
         $user = $this->users->byAccessToken($message->token);
 
-        return $user === null ? null : ['id' => (int) $user->getKey(), 'name' => (string) $user->name];
+        return $user === null ? null : new UserData((int) $user->getKey(), (string) $user->name);
     }
 }

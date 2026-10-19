@@ -33,7 +33,7 @@ class IamElsewhereTest extends ModuleTestCase
 
     public function test_iam_is_reached_over_http(): void
     {
-        $this->assertSame(['id' => 1, 'name' => 'Ada'], $this->app->make(IamClient::class)->findUser(1));
+        $this->assertSame(['id' => 1, 'name' => 'Ada'], $this->app->make(IamClient::class)->findUser(1)?->toArray());
         $this->getJson('/iam/api/v1/me')->assertNotFound();
     }
 

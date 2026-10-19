@@ -13,7 +13,7 @@ class ContractsAcrossModulesTest extends TestCase
         $id = $this->register()->json('data.id');
         Http::fake();
 
-        $this->assertSame(['id' => $id, 'name' => 'Ada'], $this->app->make(IamClient::class)->findUser($id));
+        $this->assertSame(['id' => $id, 'name' => 'Ada'], $this->app->make(IamClient::class)->findUser($id)?->toArray());
         Http::assertNothingSent();
     }
 }

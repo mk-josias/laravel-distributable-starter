@@ -2,7 +2,7 @@
 
 use Foundation\Analytics\Enums\AnalyticsPermission;
 use Foundation\Common\Auth\LocalPrincipals;
-use Foundation\Iam\Auth\IamPermissions;
+use Foundation\Iam\Auth\RpcPermissions;
 use Foundation\Iam\Shadows\UserShadow;
 
 return [
@@ -57,8 +57,8 @@ return [
     // The model LocalPrincipals reads users from: iam's copy, kept by the modules that list it in $shadows; iam sets its User.
     'principal' => UserShadow::class,
 
-    // Who says what a user may do: IamPermissions asks iam, ClaimsPermissions reads the claim named below in the token.
-    'permission_source' => env('AUTH_PERMISSION_SOURCE', IamPermissions::class),
+    // Who says what a user may do: RpcPermissions asks iam, ClaimsPermissions reads the claim named below in the token.
+    'permission_source' => env('AUTH_PERMISSION_SOURCE', RpcPermissions::class),
     'permissions_claim' => 'permissions',
 
     // The permission enums of every module, in the foundation so iam knows them wherever it runs: iam:sync-permissions creates them.

@@ -9,7 +9,7 @@ use Foundation\Common\Contracts\Auth\Principal;
 use Foundation\Iam\Services\IamClient;
 
 /** iam holds the roles and permissions: every module asks it, through its client. */
-final readonly class IamPermissions implements PermissionSource
+final readonly class RpcPermissions implements PermissionSource
 {
     public function __construct(private IamClient $iam) {}
 
