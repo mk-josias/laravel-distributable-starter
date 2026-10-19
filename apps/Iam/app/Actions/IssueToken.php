@@ -6,7 +6,7 @@ namespace Apps\Iam\Actions;
 
 use Apps\Iam\Models\User;
 use Firebase\JWT\JWT;
-use Foundation\Common\Contracts\Action;
+use Foundation\Common\Contracts\Actions\Action;
 
 /**
  * auth.tokens.validation: `signature`, a JWT the gateway checks with iam's public key, with a refresh token when

@@ -96,7 +96,7 @@ func (g gateway) serve(token string) int {
 	return rec.Code
 }
 
-const cached = "1:database:cache:iam:user:42"
+const cached = "0:gateway:user:42"
 
 func TestACachedUserPassesWithoutAskingIam(t *testing.T) {
 	g := newGateway(t, map[string]string{cached: `{"id":42,"name":"Ada"}`}, http.StatusNoContent)

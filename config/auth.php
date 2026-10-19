@@ -30,6 +30,8 @@ return [
     'gateway' => [
         'header' => 'X-Identity',
         'secret' => env('AUTH_GATEWAY_SECRET'),
+        // The Redis connection iam writes the users the gateway reads to; null writes nothing.
+        'users_connection' => env('AUTH_GATEWAY_USERS_CONNECTION'),
     ],
 
     // How the gateway checks the client's token, and so what iam issues: `signature`, a JWT checked with iam's

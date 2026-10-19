@@ -3,8 +3,8 @@
 //
 // The strategy is AUTH_TOKEN_VALIDATION_STRATEGY, the one iam issues its tokens for:
 //
-//	signature → a JWT, checked with its issuer's public key → the user read in the RPC cache → its claims signed here
-//	          → on a cache miss, iam's identity route, which fills the cache, signs them
+//	signature → a JWT, checked with its issuer's public key → the user read in gateway-cache → its claims signed here
+//	          → on a miss, iam's identity route, which writes the user there and signs the claims
 //	          → with checkUser false (an issuer outside iam), its claims signed here, no lookup
 //	issuer    → an opaque token: iam's identity route, on every request, so a revoked token stops at once
 package gatewayauth
@@ -20,8 +20,8 @@ import (
 
 	"github.com/mk-josias/gatewayauth/jwttoken"
 	"github.com/mk-josias/gatewayauth/redis"
-	"github.com/mk-josias/gatewayauth/rpccache"
 	"github.com/mk-josias/gatewayauth/trustedidentity"
+	"github.com/mk-josias/gatewayauth/usercache"
 )
 
 // Config is the middleware's settings, from Traefik's dynamic configuration.
@@ -31,11 +31,7 @@ type Config struct {
 	Redis         string `json:"redis,omitempty"`
 	RedisUser     string `json:"redisUser,omitempty"`
 	RedisPassword string `json:"redisPassword,omitempty"`
-	// The database of Laravel's cache Redis connection: REDIS_CACHE_DB.
-	RedisDatabase int `json:"redisDatabase,omitempty"`
-	// REDIS_PREFIX then CACHE_PREFIX.
-	CachePrefix string `json:"cachePrefix,omitempty"`
-	// The key IamRpcService::findUser() reads, without the user's id.
+	// The key iam writes a user under, without the id.
 	UserKey string `json:"userKey,omitempty"`
 	Iam     string `json:"iam,omitempty"`
 	// The issuer's public key: iam's, or an identity provider's (Keycloak, Auth0). Or the file holding it.
@@ -50,7 +46,7 @@ type Config struct {
 
 // CreateConfig gives the starter's defaults.
 func CreateConfig() *Config {
-	return &Config{Strategy: Signature, RedisDatabase: 1, CachePrefix: "database:cache:", UserKey: "iam:user:", CheckUser: true, Header: "X-Identity", IdentityTTL: 60}
+	return &Config{Strategy: Signature, UserKey: "gateway:user:", CheckUser: true, Header: "X-Identity", IdentityTTL: 60}
 }
 
 // The two strategies.
@@ -63,7 +59,7 @@ type auth struct {
 	next   http.Handler
 	config *Config
 	key    *rsa.PublicKey
-	cache  rpccache.Reader
+	users  usercache.Reader
 	client *http.Client
 }
 
@@ -92,13 +88,13 @@ func New(_ context.Context, next http.Handler, config *Config, _ string) (http.H
 		key = parsed
 	}
 
-	server := redis.Server{Address: config.Redis, User: config.RedisUser, Password: config.RedisPassword, Database: config.RedisDatabase, Timeout: time.Second}
+	server := redis.Server{Address: config.Redis, User: config.RedisUser, Password: config.RedisPassword, Timeout: time.Second}
 
 	return &auth{
 		next:   next,
 		config: config,
 		key:    key,
-		cache:  rpccache.Reader{Server: server, Prefix: config.CachePrefix},
+		users:  usercache.Reader{Server: server},
 		client: &http.Client{Timeout: 3 * time.Second},
 	}, nil
 }
@@ -137,7 +133,7 @@ func (a *auth) identity(authorization string) string {
 	}
 
 	var user map[string]any
-	if a.config.CheckUser && !a.cache.Read(a.config.UserKey+id, &user) {
+	if a.config.CheckUser && !a.users.Read(a.config.UserKey+id, &user) {
 		return a.askIam(authorization)
 	}
 

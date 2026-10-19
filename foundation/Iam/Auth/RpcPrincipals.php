@@ -6,14 +6,14 @@ namespace Foundation\Iam\Auth;
 
 use Foundation\Common\Auth\ClaimsPrincipal;
 use Foundation\Common\Auth\Identity;
-use Foundation\Common\Auth\Principal;
-use Foundation\Common\Auth\PrincipalResolver;
-use Foundation\Iam\Contracts\IamService;
+use Foundation\Common\Contracts\Auth\Principal;
+use Foundation\Common\Contracts\Auth\PrincipalResolver;
+use Foundation\Iam\Services\IamClient;
 
-/** The user as iam answers it, whatever proved the identity: no copy in the module, one call to iam (cached by its RpcService). */
+/** The user as iam answers it, whatever proved the identity: no copy in the module, one call to iam (cached by its client). */
 final readonly class RpcPrincipals implements PrincipalResolver
 {
-    public function __construct(private IamService $iam) {}
+    public function __construct(private IamClient $iam) {}
 
     public function resolve(Identity $identity): ?Principal
     {

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Apps\Iam\Http\Requests;
 
-use Foundation\Common\Http\ApiRequest;
+use Apps\Iam\Dto\LoginDto;
+use Foundation\Common\Http\Requests\ApiRequest;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -23,6 +24,11 @@ final class LoginRequest extends ApiRequest
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ];
+    }
+
+    public function toDto(): LoginDto
+    {
+        return LoginDto::from([...$this->validated(), 'device' => $this->device()]);
     }
 
     public function ensureIsNotRateLimited(): void

@@ -1,6 +1,9 @@
 # One container per module, each from an image that holds only its module (modules:purge), behind
 # Traefik, the only way in: http://localhost:8000. Traefik checks the client's token (gateway/) and
-# sends the modules the X-Identity they trust; their own ports stay private.
+# sends the modules the X-Identity they trust; their own ports stay private, except notifications'
+# Reverb on 8080 (the live push), which authenticates its channels itself.
+# Three networks: `public` (Traefik and the modules), `internal` (the modules, Postgres, Redis) and
+# `gateway` (iam, Traefik and gateway-cache): Traefik reaches neither Postgres nor Redis.
 # analytics reaches iam over HTTP at iam.svc; both share APP_KEY, which signs those calls.
 # Development values only: in production, set real secrets.
 
@@ -40,6 +43,7 @@ x-build: &build
     packages: ${DISTRIBUTABLE_PACKAGES:-docker/no-packages}
 
 x-module: &module
+  networks: [public, internal]
   depends_on:
     postgres:
       condition: service_healthy
@@ -56,6 +60,7 @@ services:
 
   traefik:
     image: traefik:v3.6
+    networks: [public, gateway]
     environment:
       AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:-gateway-secret}
       AUTH_TOKEN_VALIDATION_STRATEGY: ${AUTH_TOKEN_VALIDATION_STRATEGY:-signature}
@@ -85,11 +90,24 @@ services:
       SYNC_PERMISSIONS: "true"
       WITH_JWT_KEYS: "true"
       AUTH_JWT_KEYS_PATH: /keys
+      AUTH_GATEWAY_USERS_CONNECTION: gateway
+      GATEWAY_REDIS_HOST: gateway-cache
+      GATEWAY_REDIS_USERNAME: iam
+      GATEWAY_REDIS_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}
     volumes:
       - jwt-keys:/keys
     networks:
-      default:
+      public:
         aliases: [iam.svc]
+      internal:
+      gateway:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      gateway-cache:
+        condition: service_healthy
 
   analytics:
     <<: *module
@@ -123,6 +141,7 @@ services:
   postgres:
     build: ./docker/postgres
     image: distributable-postgres:local
+    networks: [internal]
     environment:
       POSTGRES_DB: distributable
       POSTGRES_USER: distributable
@@ -139,12 +158,25 @@ services:
 
   redis:
     image: valkey/valkey:8-alpine
-    # Traefik's user may only read the users iam's RpcService cached: neither write nor read the stream.
-    command: [valkey-server,
-      --user, default, "on", nopass, "~*", "&*", "+@all",
-      --user, traefik, "on", ">${REDIS_TRAEFIK_PASSWORD:-traefik-password}", "~database:cache:iam:user:*", "+get", "+select"]
+    networks: [internal]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # The users the gateway reads: only iam writes it, only Traefik reads it, nobody else joins `gateway`.
+  gateway-cache:
+    image: valkey/valkey:8-alpine
+    networks: [gateway]
+    environment:
+      GATEWAY_CACHE_IAM_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}
+    command: [valkey-server,
+      --user, default, "off",
+      --user, iam, "on", ">${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}", "~gateway:user:*", "+@connection", "+setex", "+del", "+ping",
+      --user, traefik, "on", ">${REDIS_TRAEFIK_PASSWORD:-traefik-password}", "~gateway:user:*", "+get", "+select"]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli --user iam --pass \"$$GATEWAY_CACHE_IAM_PASSWORD\" --no-auth-warning ping"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -153,3 +185,8 @@ volumes:
   pgdata:
   # iam's JWT key pair: iam writes it, Traefik reads the public key.
   jwt-keys:
+
+networks:
+  public:
+  internal:
+  gateway:

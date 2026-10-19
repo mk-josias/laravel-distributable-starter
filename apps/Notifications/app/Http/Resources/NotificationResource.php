@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apps\Notifications\Http\Resources;
 
 use Apps\Notifications\Models\Notification;
-use Foundation\Common\Http\Resource;
+use Foundation\Common\Http\Resources\Resource;
 use Illuminate\Http\Request;
 
 /** @mixin Notification */

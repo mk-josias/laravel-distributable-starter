@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Apps\Notifications\Http\Controllers\NotificationController;
+use Apps\Notifications\Http\Controllers\Api\NotificationController;
 use Foundation\Common\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;

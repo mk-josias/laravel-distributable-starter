@@ -6,12 +6,10 @@ namespace Apps\Iam\Models;
 
 use Distributable\Contracts\Shadows\Shadowed;
 use Distributable\Traits\ShadowSource;
-use Foundation\Common\Auth\IsPrincipal;
-use Foundation\Common\Auth\Principal;
-use Foundation\Common\Database\Searchable;
-use Foundation\Iam\Services\IamRpcService;
+use Foundation\Common\Contracts\Auth\Principal;
+use Foundation\Common\Traits\IsPrincipal;
+use Foundation\Common\Traits\Searchable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -39,15 +37,6 @@ final class User extends Model implements Principal, Shadowed
 
     /** @var list<string> the fields the other modules' copies carry */
     protected array $shadowed = ['name', 'email'];
-
-    /** Once a change is committed, the cached answer of findUser() is forgotten: callers and the gateway read the new one. */
-    protected static function booted(): void
-    {
-        $forget = static fn (self $user) => DB::afterCommit(static fn () => app(IamRpcService::class)->forgetUser($user->id));
-
-        self::saved($forget);
-        self::deleted($forget);
-    }
 
     /** @return array<string, string> */
     protected function casts(): array

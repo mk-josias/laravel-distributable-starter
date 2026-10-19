@@ -3,9 +3,9 @@
 namespace Apps\Analytics\Tests\Feature;
 
 use Distributable\RpcHttp\RpcSignature;
+use Foundation\Analytics\Enums\AnalyticsPermission;
 use Foundation\Iam\Auth\TrustedIdentity;
-use Foundation\Iam\Contracts\IamService;
-use Foundation\Iam\Services\IamRpcService;
+use Foundation\Iam\Services\IamClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Tests\ModuleTestCase;
@@ -22,40 +22,36 @@ class IamElsewhereTest extends ModuleTestCase
     {
         parent::setUp();
 
-        $this->ada = $this->user(1, 'Ada');
+        $this->ada = $this->user(1, 'Ada', [AnalyticsPermission::ReadDatasets->value]);
 
         Http::fake([
-            'iam.test/iam/rpc/findUser' => fn (Request $request) => $request['arguments']['id'] === 1
+            'iam.test/iam/rpc/1/find-user' => fn (Request $request) => $request['payload']['id'] === 1
                 ? Http::response(['id' => 1, 'name' => 'Ada'])
                 : Http::response(null, 404),
         ]);
     }
 
-    public function test_the_contract_is_answered_by_the_rpc_service(): void
+    public function test_iam_is_reached_over_http(): void
     {
-        $this->assertInstanceOf(IamRpcService::class, $this->app->make(IamService::class));
+        $this->assertSame(['id' => 1, 'name' => 'Ada'], $this->app->make(IamClient::class)->findUser(1));
         $this->getJson('/iam/api/v1/me')->assertNotFound();
     }
 
-    public function test_a_route_of_analytics_authenticates_the_identity_the_gateway_signed_without_calling_iam(): void
+    public function test_a_route_of_analytics_authenticates_the_identity_the_gateway_signed_without_asking_iam_who_it_is(): void
     {
-        $this->getJson('/analytics/api/v1/signups', $this->ada)->assertOk();
-        $this->getJson('/analytics/api/v1/signups', ['X-Identity' => TrustedIdentity::sign(['sub' => 1], time() + 60, 'forged')])->assertUnauthorized();
-        $this->getJson('/analytics/api/v1/signups', $this->identity(2))->assertUnauthorized();
-        $this->getJson('/analytics/api/v1/signups', ['Authorization' => 'Bearer any-token'])->assertUnauthorized();
+        $this->getJson('/analytics/api/v1/metrics', $this->ada)->assertOk();
+        $this->getJson('/analytics/api/v1/metrics', ['X-Identity' => TrustedIdentity::sign(['sub' => 1], time() + 60, 'forged')])->assertUnauthorized();
+        $this->getJson('/analytics/api/v1/metrics', $this->identity(2))->assertUnauthorized();
+        $this->getJson('/analytics/api/v1/metrics', ['Authorization' => 'Bearer any-token'])->assertUnauthorized();
 
-        Http::assertNothingSent();
+        Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), 'find-user'));
     }
 
-    public function test_the_validation_rule_asks_iam_over_http(): void
+    public function test_the_permission_is_asked_to_iam_over_signed_http(): void
     {
-        $this->getJson('/analytics/api/v1/signups?user_id=1', $this->ada)->assertOk();
+        $this->getJson('/analytics/api/v1/metrics', $this->ada)->assertOk();
 
-        $this->getJson('/analytics/api/v1/signups?user_id=999', $this->ada)
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['user_id' => 'No user has this id.']);
-
-        Http::assertSent(fn (Request $request): bool => $request->url() === 'http://iam.test/iam/rpc/findUser'
+        Http::assertSent(fn (Request $request): bool => $request->url() === 'http://iam.test/iam/rpc/1/grants'
             && $request->hasHeader(RpcSignature::SIGNATURE_HEADER));
     }
 }

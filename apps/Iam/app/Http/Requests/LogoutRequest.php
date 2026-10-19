@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Apps\Iam\Http\Requests;
 
-use Foundation\Common\Http\ApiRequest;
+use Apps\Iam\Dto\RevokeTokensDto;
+use Foundation\Common\Http\Requests\ApiRequest;
 
 final class LogoutRequest extends ApiRequest
 {
@@ -14,5 +15,10 @@ final class LogoutRequest extends ApiRequest
     public function rules(): array
     {
         return [];
+    }
+
+    public function toDto(bool $everyDevice = false): RevokeTokensDto
+    {
+        return new RevokeTokensDto($this->principalIdOrFail(), $everyDevice ? null : $this->device());
     }
 }

@@ -6,8 +6,8 @@ namespace Foundation\Common\Http\Middleware;
 
 use Closure;
 use Foundation\Common\Auth\Identity;
-use Foundation\Common\Auth\PrincipalResolver;
-use Foundation\Common\Auth\TokenValidator;
+use Foundation\Common\Contracts\Auth\PrincipalResolver;
+use Foundation\Common\Contracts\Auth\TokenValidator;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

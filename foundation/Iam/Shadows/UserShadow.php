@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Foundation\Iam\Shadows;
 
 use Distributable\Models\ShadowModel;
-use Foundation\Common\Auth\IsPrincipal;
-use Foundation\Common\Auth\Principal;
+use Foundation\Common\Contracts\Auth\Principal;
+use Foundation\Common\Traits\IsPrincipal;
 
 /**
  * @property int $id

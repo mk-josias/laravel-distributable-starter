@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Foundation\Common\Broadcasting;
 
-use Foundation\Common\Auth\Principal;
+use Foundation\Common\Contracts\Auth\Principal;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Broadcast;
 

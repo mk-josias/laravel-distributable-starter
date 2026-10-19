@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Foundation\Iam\Auth;
 
-use Foundation\Common\Auth\PermissionSource;
-use Foundation\Common\Auth\Principal;
-use Foundation\Iam\Contracts\IamService;
+use Foundation\Common\Contracts\Auth\PermissionSource;
+use Foundation\Common\Contracts\Auth\Principal;
+use Foundation\Iam\Services\IamClient;
 
-/** iam holds the roles and permissions: every module asks it, through its contract. */
+/** iam holds the roles and permissions: every module asks it, through its client. */
 final readonly class IamPermissions implements PermissionSource
 {
-    public function __construct(private IamService $iam) {}
+    public function __construct(private IamClient $iam) {}
 
     public function grants(Principal $principal): array
     {

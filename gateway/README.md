@@ -1,6 +1,6 @@
 # The gateway
 
-Traefik, in front of the modules: the only way in. It checks the client's token once, then sends
+Traefik, in front of the modules: the only way into the API. It checks the client's token once, then sends
 the module the `X-Identity` it trusts. Both compose files run it on `:8000`.
 
 ```
@@ -14,7 +14,7 @@ gateway/
     └── auth/                    one plugin, one Go module: github.com/mk-josias/gatewayauth
         ├── plugin.go            Config, New, ServeHTTP: the order of the steps
         ├── jwttoken/            checks a JWT (≙ Foundation\Iam\Auth\JwtTokens)
-        ├── rpccache/            reads an answer of the RPC cache (≙ RpcService::read())
+        ├── usercache/           reads a user iam wrote (≙ Apps\Iam\Services\GatewayCache)
         ├── redis/               the least of a Redis client: AUTH, SELECT, GET
         └── trustedidentity/     signs X-Identity (≙ Foundation\Iam\Auth\TrustedIdentity)
 ```
@@ -24,9 +24,9 @@ gateway/
 ```
 Authorization: Bearer <token>, checked by AUTH_TOKEN_VALIDATION_STRATEGY:
   signature → a JWT, checked with the issuer's public key
-            → GET database:cache:iam:user:{sub}, in Redis database 1
+            → GET gateway:user:{sub}, in gateway-cache
                  present → the token's claims signed here, iam is not called
-                 missing → GET iam /identity, which fills the key and signs
+                 missing → GET iam /identity, which writes the key and signs
   issuer    → an opaque token: GET iam /identity, every time, so a revoked token stops at once
   none, or refused → 401, the module is never reached
 → the module, with X-Identity: {base64url claims}.{hmac}
@@ -57,10 +57,8 @@ container. A module added later gets a router and a service of its own, like `an
 | Setting | Starter's value | What it is |
 |---|---|---|
 | `strategy` | `AUTH_TOKEN_VALIDATION_STRATEGY`, `signature` | `signature` or `issuer`, the same as iam's |
-| `redis`, `redisUser`, `redisPassword` | `redis:6379`, `traefik`, `REDIS_TRAEFIK_PASSWORD` | where the RPC cache is, and as whom |
-| `redisDatabase` | `1` | `REDIS_CACHE_DB`: the database of Laravel's cache connection |
-| `cachePrefix` | `database:cache:` | `REDIS_PREFIX` then `CACHE_PREFIX` |
-| `userKey` | `iam:user:` | the key `IamRpcService::findUser()` caches, without the id |
+| `redis`, `redisUser`, `redisPassword` | `gateway-cache:6379`, `traefik`, `REDIS_TRAEFIK_PASSWORD` | where the users are, and as whom |
+| `userKey` | `gateway:user:` | the key iam writes a user under, without the id |
 | `iam` | `http://iam.svc:8000/iam/api/v1/identity` | asked on a miss, and for every token under `issuer` |
 | `publicKeyFile`, or `publicKey` | `/keys/jwt-public.key` | the issuer's key, under `signature`: iam writes it to the `jwt-keys` volume |
 | `checkUser` | `true` | `false` when the issuer is outside iam: its claims are signed with no lookup |
@@ -69,10 +67,11 @@ container. A module added later gets a router and a service of its own, like `an
 
 ## Redis
 
-Traefik reaches Redis as the `traefik` user (the `command` of the `redis` service), which may only
-read the cached users: `~database:cache:iam:user:* +get +select`. It cannot write a key, nor read
-the event stream. In production, set `REDIS_TRAEFIK_PASSWORD`, or give the RPC cache a Redis of its
-own.
+Traefik reads the users from `gateway-cache`, a Redis of its own on the `gateway` network, which only
+iam and Traefik join. iam writes `gateway:user:{id}` (`GatewayCache`, one hour at most, rewritten on
+every change and removed with the user); Traefik's user may only `get` those keys. `default` is off.
+The modules' Redis and Postgres are on `internal`, which Traefik does not join. In production, set
+`REDIS_TRAEFIK_PASSWORD` and `GATEWAY_CACHE_IAM_PASSWORD`.
 
 ## Adding to it
 

@@ -19,9 +19,9 @@ notifications="$gateway/notifications/api/v1"
 
 fail() { echo "FAIL: $*" >&2; "${compose[@]}" logs traefik | tail -20 >&2; exit 1; }
 status() { curl -s -o /dev/null -w '%{http_code}' -H 'Accept: application/json' "$@"; }
-# Laravel's cache lives in the database of its `cache` Redis connection (REDIS_CACHE_DB, 1); the stream in 0.
-redis() { "${compose[@]}" exec -T redis valkey-cli -n 1 "$@"; }
-as_traefik() { "${compose[@]}" exec -T redis valkey-cli --user traefik --pass "${REDIS_TRAEFIK_PASSWORD:-traefik-password}" --no-auth-warning "$@"; }
+# iam writes the users the gateway reads into gateway-cache; Traefik reads them.
+as_iam() { "${compose[@]}" exec -T gateway-cache valkey-cli --user iam --pass "${GATEWAY_CACHE_IAM_PASSWORD:-iam-password}" --no-auth-warning "$@"; }
+as_traefik() { "${compose[@]}" exec -T gateway-cache valkey-cli --user traefik --pass "${REDIS_TRAEFIK_PASSWORD:-traefik-password}" --no-auth-warning "$@"; }
 
 trap '"${compose[@]}" down -v >/dev/null 2>&1' EXIT
 "${compose[@]}" up -d --build --wait
@@ -29,7 +29,7 @@ trap '"${compose[@]}" down -v >/dev/null 2>&1' EXIT
 # Traefik loads its routes once it has compiled the plugin: until then, no answer or a 404; then the
 # plugin's 401. Not on /iam/api/v1/register, which allows 6 calls a minute.
 for _ in $(seq 60); do
-    [[ $(status "$analytics/users/1") == 401 ]] && break
+    [[ $(status "$analytics/metrics") == 401 ]] && break
     sleep 1
 done
 
@@ -53,29 +53,29 @@ eventually() {
     fail "$what"
 }
 
-eventually "analytics recorded the signup, with the user copied locally" \
-    bash -c "$(declare -f get); token='$token'; get '$analytics/signups?user_id=$id' | jq -e '.data[0].user.name == \"Ana\"' >/dev/null"
-eventually "analytics reads the user from iam over RPC" \
-    bash -c "$(declare -f get); token='$token'; get '$analytics/users/$id' | jq -e '.data.id == $id' >/dev/null"
+eventually "analytics knows the user and asked iam for the grants over RPC: authenticated, not allowed" \
+    bash -c "[[ \$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept: application/json' -H 'Authorization: Bearer $token' '$analytics/metrics') == 403 ]]"
 eventually "notifications created the welcome notification" \
     bash -c "$(declare -f get); token='$token'; get '$notifications/notifications' | jq -e '.data | length == 1' >/dev/null"
 
-key="database:cache:iam:user:$id"
+key="gateway:user:$id"
 
-[[ $(status "$analytics/users/$id") == 401 ]] || fail "a request without token went through"
-[[ $(status -H "X-Identity: eyJzdWIiOjF9.forged" "$analytics/users/$id") == 401 ]] || fail "a forged X-Identity went through"
+[[ $(as_traefik GET "$key") == *'"id":'"$id"* ]] || fail "iam did not write $key when the user registered"
+
+[[ $(status "$analytics/metrics") == 401 ]] || fail "a request without token went through"
+[[ $(status -H "X-Identity: eyJzdWIiOjF9.forged" "$analytics/metrics") == 401 ]] || fail "a forged X-Identity went through"
 echo "ok: no token, or a forged X-Identity, is refused"
 
-redis DEL "$key" >/dev/null
-[[ $(status -H "Authorization: Bearer $token" "$analytics/users/$id") == 200 ]] || fail "a valid JWT was refused"
-[[ $(redis GET "$key") == *'"id":'"$id"* ]] || fail "iam did not fill $key"
-echo "ok: on a cache miss, Traefik asked iam, which filled $key as JSON"
+as_iam DEL "$key" >/dev/null
+[[ $(status -H "Authorization: Bearer $token" "$analytics/metrics") == 403 ]] || fail "a valid JWT was refused"
+[[ $(as_traefik GET "$key") == *'"id":'"$id"* ]] || fail "iam did not write $key on a miss"
+echo "ok: on a miss, Traefik asked iam, which wrote $key as JSON"
 
 [[ $(as_traefik SET "$key" x) == *NOPERM* ]] || fail "Traefik's Redis user can write"
-[[ $(as_traefik XRANGE database:distributable:events - +) == *NOPERM* ]] || fail "Traefik's Redis user can read the stream"
-echo "ok: Traefik's Redis user only reads the cached users"
+[[ -z $("${compose[@]}" exec -T traefik getent hosts redis postgres) ]] || fail "Traefik resolves Redis or Postgres"
+echo "ok: Traefik reads the gateway's users and reaches neither Redis nor Postgres"
 
-[[ $(status -X POST "$gateway/iam/rpc/findUser") == 404 ]] || fail "the RPC route is reachable through Traefik"
+[[ $(status -X POST "$gateway/iam/rpc/1/find-user") == 404 ]] || fail "the RPC route is reachable through Traefik"
 echo "ok: the RPC routes stay inside"
 
 echo "PASS: $compose_file"

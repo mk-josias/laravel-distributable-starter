@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Apps\Analytics\Console;
 
+use Apps\Analytics\Database\MonthlyPartitions;
 use Apps\Analytics\Models\Dataset;
 use Apps\Analytics\Models\Mail;
 use Apps\Analytics\Models\Signup;
-use Apps\Analytics\Services\MonthlyPartitions;
 use DateTimeInterface;
 use Distributable\Context\ModuleContext;
 use Illuminate\Console\Command;

@@ -7,7 +7,7 @@ namespace Foundation\Iam\Auth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Foundation\Common\Auth\Identity;
-use Foundation\Common\Auth\TokenValidator;
+use Foundation\Common\Contracts\Auth\TokenValidator;
 use InvalidArgumentException;
 use Throwable;
 

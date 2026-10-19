@@ -6,7 +6,7 @@ use Apps\Iam\Actions\GrantRole;
 use Apps\Iam\Actions\SetRolePermissions;
 use Apps\Iam\Models\User;
 use Apps\Iam\Tests\Fixtures\SamplePermission;
-use Foundation\Iam\Contracts\IamService;
+use Foundation\Iam\Services\IamClient;
 use Illuminate\Support\Facades\DB;
 use Tests\ModuleTestCase;
 
@@ -28,16 +28,16 @@ class PermissionsTest extends ModuleTestCase
 
     public function test_a_grant_and_a_revocation_are_answered_at_once_despite_the_cache(): void
     {
-        $this->assertSame([], app(IamService::class)->grants($this->user->id));
+        $this->assertSame([], app(IamClient::class)->grants($this->user->id));
 
         app(SetRolePermissions::class)->execute('analyst', [SamplePermission::Read]);
         app(GrantRole::class)->grant($this->user, 'analyst');
 
-        $this->assertSame(['sample.read'], app(IamService::class)->grants($this->user->id));
+        $this->assertSame(['sample.read'], app(IamClient::class)->grants($this->user->id));
 
         app(GrantRole::class)->revoke($this->user, 'analyst');
 
-        $this->assertSame([], app(IamService::class)->grants($this->user->id));
+        $this->assertSame([], app(IamClient::class)->grants($this->user->id));
     }
 
     public function test_changing_a_role_drops_the_cached_grants_of_every_user_holding_it(): void
@@ -45,11 +45,11 @@ class PermissionsTest extends ModuleTestCase
         app(SetRolePermissions::class)->execute('analyst', [SamplePermission::Read]);
         app(GrantRole::class)->grant($this->user, 'analyst');
 
-        $this->assertSame(['sample.read'], app(IamService::class)->grants($this->user->id));
+        $this->assertSame(['sample.read'], app(IamClient::class)->grants($this->user->id));
 
         app(SetRolePermissions::class)->execute('analyst', []);
 
-        $this->assertSame([], app(IamService::class)->grants($this->user->id));
+        $this->assertSame([], app(IamClient::class)->grants($this->user->id));
     }
 
     public function test_only_prune_deletes_a_permission_no_module_declares(): void

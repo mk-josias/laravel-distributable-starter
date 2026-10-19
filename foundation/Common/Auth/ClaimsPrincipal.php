@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Foundation\Common\Auth;
 
+use Foundation\Common\Contracts\Auth\Principal;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 
 /** A user known only by its token: no row in the module's database. */

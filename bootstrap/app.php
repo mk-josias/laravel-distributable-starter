@@ -1,7 +1,7 @@
 <?php
 
-use Foundation\Common\Contracts\RendersApiEnvelope;
-use Foundation\Common\Http\ApiErrorCode;
+use Foundation\Common\Contracts\Http\RendersApiEnvelope;
+use Foundation\Common\Enums\ApiErrorCode;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;

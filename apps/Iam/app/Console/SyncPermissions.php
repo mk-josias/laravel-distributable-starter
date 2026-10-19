@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Apps\Iam\Console;
 
 use BackedEnum;
-use Foundation\Iam\Services\IamRpcService;
+use Foundation\Iam\Services\IamClient;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -17,7 +17,7 @@ final class SyncPermissions extends Command
 
     protected $description = 'Create the permissions listed in auth.permissions';
 
-    public function handle(IamRpcService $iam, PermissionRegistrar $registrar): int
+    public function handle(IamClient $iam, PermissionRegistrar $registrar): int
     {
         $declared = [];
 

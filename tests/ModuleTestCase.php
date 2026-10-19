@@ -21,7 +21,7 @@ abstract class ModuleTestCase extends TestCase
         parent::setUp();
 
         Http::fake([
-            'iam.test/iam/rpc/grants' => fn (Request $request) => Http::response($this->grants[$request['arguments']['userId']] ?? []),
+            'iam.test/iam/rpc/1/grants' => fn (Request $request) => Http::response($this->grants[$request['payload']['userId']] ?? []),
         ]);
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Foundation\Iam\Auth;
 
 use Foundation\Common\Auth\Identity;
-use Foundation\Common\Auth\TokenValidator;
+use Foundation\Common\Contracts\Auth\TokenValidator;
 
 /**
  * X-Identity, written by the gateway once it checked the client's token: `{payload}.{hmac}`, the payload

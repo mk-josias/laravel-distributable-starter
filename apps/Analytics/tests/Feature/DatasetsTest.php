@@ -21,15 +21,15 @@ class DatasetsTest extends ModuleTestCase
 
         $this->artisan('analytics:compute --from=2026-03-02 --to=2026-03-03')->expectsOutput('2 hourly buckets computed.')->assertSuccessful();
 
-        $this->getJson('/analytics/api/v1/datasets?group=hour', $headers)->assertOk()->assertExactJson(['success' => true, 'data' => [
+        $this->getJson('/analytics/api/v1/metrics?group=hour', $headers)->assertOk()->assertExactJson(['success' => true, 'data' => [
             ['bucket' => '2026-03-02 09:00', 'signups_count' => 2, 'mails_sent_count' => 1, 'users_total' => 2],
             ['bucket' => '2026-03-03 14:00', 'signups_count' => 1, 'mails_sent_count' => 0, 'users_total' => 3],
         ]]);
 
-        $this->getJson('/analytics/api/v1/datasets?group=none&measures[]=signups_count', $headers)
+        $this->getJson('/analytics/api/v1/metrics?group=none&measures[]=signups_count', $headers)
             ->assertOk()->assertExactJson(['success' => true, 'data' => [['bucket' => null, 'signups_count' => 3]]]);
 
-        $this->getJson('/analytics/api/v1/datasets?group=month&from=2026-03-03', $headers)
+        $this->getJson('/analytics/api/v1/metrics?group=month&filter[from]=2026-03-03', $headers)
             ->assertOk()->assertExactJson(['success' => true, 'data' => [['bucket' => '2026-03', 'signups_count' => 1, 'mails_sent_count' => 0, 'users_total' => 3]]]);
     }
 
@@ -63,15 +63,15 @@ class DatasetsTest extends ModuleTestCase
 
     public function test_an_unknown_group_or_measure_is_refused(): void
     {
-        $this->getJson('/analytics/api/v1/datasets?group=year&measures[]=revenue', $this->signedUpAt(1, 'ada', '2026-03-02 09:15'))
+        $this->getJson('/analytics/api/v1/metrics?group=year&measures[]=revenue', $this->signedUpAt(1, 'ada', '2026-03-02 09:15'))
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['group', 'measures.0']);
     }
 
     public function test_reading_the_datasets_needs_the_permission_iam_grants(): void
     {
-        $this->getJson('/analytics/api/v1/datasets', $this->user(1, 'ada'))->assertForbidden();
-        $this->getJson('/analytics/api/v1/datasets', $this->user(2, 'grace', [AnalyticsPermission::ReadDatasets->value]))->assertOk();
+        $this->getJson('/analytics/api/v1/metrics', $this->user(1, 'ada'))->assertForbidden();
+        $this->getJson('/analytics/api/v1/metrics', $this->user(2, 'grace', [AnalyticsPermission::ReadDatasets->value]))->assertOk();
     }
 
     /** @return array{X-Identity: string} */

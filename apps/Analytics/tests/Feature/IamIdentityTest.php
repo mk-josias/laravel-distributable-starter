@@ -18,7 +18,7 @@ class IamIdentityTest extends ModuleTestCase
         parent::setUp();
 
         Http::fake([
-            'iam.test/iam/rpc/findUser' => fn ($request) => Http::response($request['arguments']['id'] === 5 ? ['id' => 5, 'name' => 'Ada'] : null),
+            'iam.test/iam/rpc/1/find-user' => fn ($request) => Http::response($request['payload']['id'] === 5 ? ['id' => 5, 'name' => 'Ada'] : null),
         ]);
     }
 

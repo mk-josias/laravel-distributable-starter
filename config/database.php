@@ -182,6 +182,16 @@ return [
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
 
+        // The Redis only iam writes and the gateway reads. Its keys carry no prefix: Traefik reads them as they are.
+        'gateway' => [
+            'host' => env('GATEWAY_REDIS_HOST', '127.0.0.1'),
+            'username' => env('GATEWAY_REDIS_USERNAME'),
+            'password' => env('GATEWAY_REDIS_PASSWORD'),
+            'port' => env('GATEWAY_REDIS_PORT', '6379'),
+            'database' => '0',
+            'options' => ['prefix' => ''],
+        ],
+
     ],
 
 ];

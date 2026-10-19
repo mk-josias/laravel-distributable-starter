@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Foundation\Common\Auth;
 
+use Foundation\Common\Contracts\Auth\Principal;
+use Foundation\Common\Contracts\Auth\PrincipalResolver;
+
 /** Loads the user from the database of the running module, through auth.principal: iam's copy, which iam itself replaces with its User. */
 final readonly class LocalPrincipals implements PrincipalResolver
 {

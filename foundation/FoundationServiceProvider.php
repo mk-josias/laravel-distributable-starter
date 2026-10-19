@@ -5,26 +5,20 @@ declare(strict_types=1);
 namespace Foundation;
 
 use Distributable\Providers\FoundationServiceProvider as BaseServiceProvider;
-use Foundation\Common\Auth\PermissionSource;
-use Foundation\Common\Auth\PrincipalResolver;
-use Foundation\Common\Auth\TokenValidator;
 use Foundation\Common\Broadcasting\PrivateUserChannel;
+use Foundation\Common\Contracts\Auth\PermissionSource;
+use Foundation\Common\Contracts\Auth\PrincipalResolver;
+use Foundation\Common\Contracts\Auth\TokenValidator;
 use Foundation\Iam\Auth\JwtTokens;
 use Foundation\Iam\Auth\TrustedIdentity;
-use Foundation\Iam\Contracts\IamService;
 use Foundation\Iam\Events\IamEvent;
 use Foundation\Iam\Events\UserRegisteredPayload;
-use Foundation\Iam\Services\IamRpcService;
 use Foundation\Notifications\Events\MailSentPayload;
 use Foundation\Notifications\Events\NotificationsEvent;
 use Illuminate\Contracts\Foundation\Application;
 
 final class FoundationServiceProvider extends BaseServiceProvider
 {
-    protected array $rpc = [
-        IamService::class => IamRpcService::class,
-    ];
-
     protected array $payloads = [
         IamEvent::UserRegistered->value => UserRegisteredPayload::class,
         NotificationsEvent::MailSent->value => MailSentPayload::class,

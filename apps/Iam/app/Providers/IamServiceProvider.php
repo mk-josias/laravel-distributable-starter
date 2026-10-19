@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace Apps\Iam\Providers;
 
 use Apps\Iam\Models\AccessToken;
-use Apps\Iam\Services\IamService;
+use Apps\Iam\Rpc\FindUserByTokenHandler;
+use Apps\Iam\Rpc\FindUserHandler;
+use Apps\Iam\Rpc\GrantsHandler;
 use Distributable\Providers\ServiceProvider;
-use Foundation\Iam\Contracts\IamService as Contract;
+use Foundation\Iam\Rpc\FindUser;
+use Foundation\Iam\Rpc\FindUserByToken;
+use Foundation\Iam\Rpc\Grants;
 use Laravel\Sanctum\Sanctum;
 
 final class IamServiceProvider extends ServiceProvider
 {
-    protected array $services = [
-        Contract::class => IamService::class,
+    protected array $rpc = [
+        FindUser::class => FindUserHandler::class,
+        FindUserByToken::class => FindUserByTokenHandler::class,
+        Grants::class => GrantsHandler::class,
     ];
 
     public function boot(): void

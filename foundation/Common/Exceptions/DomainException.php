@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Foundation\Common\Exceptions;
 
 use Distributable\Traits\ResolvesModule;
-use Foundation\Common\Contracts\RendersApiEnvelope;
+use Foundation\Common\Contracts\Http\RendersApiEnvelope;
 use RuntimeException;
 use Throwable;
 

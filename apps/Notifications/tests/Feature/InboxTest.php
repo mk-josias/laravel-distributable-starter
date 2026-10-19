@@ -37,6 +37,11 @@ class InboxTest extends ModuleTestCase
         $this->getJson('/notifications/api/v1/notifications?filter[recipient_user_id]=2', $headers)->assertBadRequest();
     }
 
+    public function test_a_page_size_out_of_range_is_refused(): void
+    {
+        $this->getJson('/notifications/api/v1/notifications?paginate=0', $this->registered(1, 'ada'))->assertUnprocessable();
+    }
+
     public function test_nobody_reads_or_marks_the_notification_of_someone_else(): void
     {
         $ada = $this->registered(1, 'ada');

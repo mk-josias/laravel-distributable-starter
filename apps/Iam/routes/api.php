@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Apps\Iam\Http\Controllers\AuthController;
-use Apps\Iam\Http\Controllers\IdentityController;
+use Apps\Iam\Http\Controllers\Api\AuthController;
+use Apps\Iam\Http\Controllers\Api\IdentityController;
 use Foundation\Common\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Apps\Analytics\Console;
 
-use Apps\Analytics\Services\MonthlyPartitions;
+use Apps\Analytics\Database\MonthlyPartitions;
 use Distributable\Context\ModuleContext;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
