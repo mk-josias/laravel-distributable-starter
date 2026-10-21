@@ -36,7 +36,7 @@ php artisan key:generate
 # the RSA pair iam signs tokens with, in storage/jwt-*.key
 php artisan auth:jwt-keys
 # migrates each module's database, on the `owner` connection each module declares
-php artisan migrate --module=* --database=owner
+php artisan migrate --module='*' --database=owner
 # the permissions listed in auth.permissions, see Permissions
 php artisan iam:sync-permissions --prune
 php artisan serve
