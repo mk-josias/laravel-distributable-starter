@@ -11,17 +11,15 @@ use Foundation\Common\Contracts\Auth\PrincipalResolver;
 use Foundation\Common\Contracts\Auth\TokenValidator;
 use Foundation\Iam\Auth\JwtTokens;
 use Foundation\Iam\Auth\TrustedIdentity;
-use Foundation\Iam\Events\IamEvent;
 use Foundation\Iam\Events\UserRegisteredPayload;
 use Foundation\Notifications\Events\MailSentPayload;
-use Foundation\Notifications\Events\NotificationsEvent;
 use Illuminate\Contracts\Foundation\Application;
 
 final class FoundationServiceProvider extends BaseServiceProvider
 {
     protected array $payloads = [
-        IamEvent::UserRegistered->value => UserRegisteredPayload::class,
-        NotificationsEvent::MailSent->value => MailSentPayload::class,
+        UserRegisteredPayload::class,
+        MailSentPayload::class,
     ];
 
     /** A module reads only the gateway's X-Identity; the user and its permissions come from classes named in config/auth.php. */

@@ -9,7 +9,6 @@ use Apps\Analytics\Models\Dataset;
 use Apps\Analytics\Models\Mail;
 use Apps\Analytics\Models\Signup;
 use DateTimeInterface;
-use Distributable\Context\ModuleContext;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -29,10 +28,10 @@ final class ComputeDatasets extends Command
 
     protected $description = 'Rebuild the hourly datasets of yesterday and today, of a day, or of a range, from the journals';
 
-    public function handle(MonthlyPartitions $partitions, ModuleContext $context): int
+    public function handle(MonthlyPartitions $partitions): int
     {
         $buckets = 0;
-        $owner = DB::connection($context->current()?->ownerConnection());
+        $owner = DB::connection('owner');
 
         foreach ($this->days() as $day) {
             $partitions->ensure($day, $owner);

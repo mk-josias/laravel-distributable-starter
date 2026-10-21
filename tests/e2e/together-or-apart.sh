@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# The same user journey against one setup, docker-compose.mono.yml (together) or docker-compose.yml
+# The same user journey against one setup, docker-compose.mono.yml (together) or docker-compose.mesh.yml
 # (apart), through Traefik, the only way in.
 set -euo pipefail
 
-compose_file="${1:?usage: tests/e2e/together-or-apart.sh docker-compose.mono.yml|docker-compose.yml}"
+compose_file="${1:?usage: tests/e2e/together-or-apart.sh docker-compose.mono.yml|docker-compose.mesh.yml}"
 cd "$(dirname "$0")/../.."
 compose=(docker compose -f "$compose_file")
 

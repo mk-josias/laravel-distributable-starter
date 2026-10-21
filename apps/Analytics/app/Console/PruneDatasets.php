@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Apps\Analytics\Console;
 
 use Apps\Analytics\Database\MonthlyPartitions;
-use Distributable\Context\ModuleContext;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +17,7 @@ final class PruneDatasets extends Command
 
     protected $description = 'Drop the datasets of the months older than the ones kept';
 
-    public function handle(MonthlyPartitions $partitions, ModuleContext $context): int
+    public function handle(MonthlyPartitions $partitions): int
     {
         $keep = (int) $this->option('keep');
 
@@ -28,7 +27,7 @@ final class PruneDatasets extends Command
             return self::FAILURE;
         }
 
-        $dropped = $partitions->prune(Carbon::now()->startOfMonth()->subMonthsNoOverflow($keep - 1), DB::connection($context->current()?->ownerConnection()));
+        $dropped = $partitions->prune(Carbon::now()->startOfMonth()->subMonthsNoOverflow($keep - 1), DB::connection('owner'));
 
         $this->info($dropped === [] ? 'Nothing to prune.' : 'Pruned: '.implode(', ', $dropped).'.');
 

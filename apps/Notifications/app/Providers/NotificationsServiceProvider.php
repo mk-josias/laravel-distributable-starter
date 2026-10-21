@@ -11,7 +11,7 @@ use Foundation\Iam\Shadows\UserShadow;
 
 final class NotificationsServiceProvider extends ServiceProvider
 {
-    protected array $handlers = [
+    protected array $streamHandlers = [
         IamEvent::UserRegistered->value => [SendWelcome::class],
     ];
 

@@ -16,7 +16,7 @@ use Laravel\Sanctum\Sanctum;
 
 final class IamServiceProvider extends ServiceProvider
 {
-    protected array $rpc = [
+    protected array $rpcHandlers = [
         FindUser::class => FindUserHandler::class,
         FindUserByToken::class => FindUserByTokenHandler::class,
         Grants::class => GrantsHandler::class,

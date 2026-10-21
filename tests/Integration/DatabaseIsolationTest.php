@@ -15,7 +15,7 @@ class DatabaseIsolationTest extends TestCase
             ->assertJsonStructure(['success', 'data' => ['id', 'name']])
             ->assertJsonMissingPath('data.token');
 
-        $this->assertSame(1, DB::connection('iam')->table('iam_users')->count());
-        $this->assertSame(0, DB::connection('analytics')->table('iam_users')->count());
+        $this->assertSame(1, $this->inModule('iam', fn () => DB::table('iam_users')->count()));
+        $this->assertSame(0, $this->inModule('analytics', fn () => DB::table('iam_users')->count()));
     }
 }

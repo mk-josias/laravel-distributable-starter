@@ -48,7 +48,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan auth:jwt-keys",
-            "@php artisan migrate --force",
+            "@php artisan migrate --module=* --database=owner --force",
             "@php artisan iam:sync-permissions --prune"
         ],
         "dev": [
@@ -80,7 +80,7 @@
             "@php artisan skeleton:setup --ansi",
             "@composer update --lock --no-scripts --no-interaction --quiet",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
-            "@php artisan migrate --graceful --ansi",
+            "@php artisan migrate --module=* --database=owner --graceful --ansi",
             "@php artisan iam:sync-permissions --prune --ansi"
         ],
         "pre-package-uninstall": [

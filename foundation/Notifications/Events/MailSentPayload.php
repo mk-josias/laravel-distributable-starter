@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Foundation\Notifications\Events;
 
+use Distributable\Attributes\Payload;
 use Distributable\Contracts\Stream\Versioned;
 use Foundation\Common\Dto\Dto;
 
 /** What notifications.mail.sent carries: which notification left, to whom, about what. */
+#[Payload(NotificationsEvent::MailSent)]
 final class MailSentPayload extends Dto implements Versioned
 {
     public function __construct(
@@ -15,11 +17,6 @@ final class MailSentPayload extends Dto implements Versioned
         public int $user_id,
         public string $type,
     ) {}
-
-    public static function version(): int
-    {
-        return 1;
-    }
 
     public static function upcast(int $from, array $payload): array
     {

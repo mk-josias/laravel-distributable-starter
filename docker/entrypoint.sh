@@ -12,7 +12,7 @@ fi
 
 # Only the http role migrates: one container per module set does it, the others wait on its healthcheck.
 if [ "${WITH_HTTP:-true}" = "true" ]; then
-    php artisan migrate --force
+    php artisan migrate --module=* --database=owner --force
 fi
 
 # Only the container that runs iam owns the permissions.

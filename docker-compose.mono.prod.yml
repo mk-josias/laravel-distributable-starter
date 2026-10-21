@@ -1,0 +1,28 @@
+# Production: docker compose --env-file .env.production -f docker-compose.mono.yml -f docker-compose.mono.prod.yml up -d
+# Refuses to start while one of these is unset. Generate them as .env.production.example says.
+
+x-secrets: &secrets
+  APP_KEY: ${APP_KEY:?set APP_KEY}
+  DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+  DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD}
+  AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:?set AUTH_GATEWAY_SECRET}
+  DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:?set DISTRIBUTABLE_RPC_SECRET}
+  REVERB_APP_KEY: ${REVERB_APP_KEY:?set REVERB_APP_KEY}
+  REVERB_APP_SECRET: ${REVERB_APP_SECRET:?set REVERB_APP_SECRET}
+  GATEWAY_REDIS_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:?set GATEWAY_CACHE_IAM_PASSWORD}
+
+services:
+  app:
+    environment: *secrets
+  traefik:
+    environment:
+      AUTH_GATEWAY_SECRET: ${AUTH_GATEWAY_SECRET:?set AUTH_GATEWAY_SECRET}
+      DISTRIBUTABLE_RPC_SECRET: ${DISTRIBUTABLE_RPC_SECRET:?set DISTRIBUTABLE_RPC_SECRET}
+      REDIS_TRAEFIK_PASSWORD: ${REDIS_TRAEFIK_PASSWORD:?set REDIS_TRAEFIK_PASSWORD}
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD}
+  gateway-cache:
+    environment:
+      GATEWAY_CACHE_IAM_PASSWORD: ${GATEWAY_CACHE_IAM_PASSWORD:?set GATEWAY_CACHE_IAM_PASSWORD}

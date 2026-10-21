@@ -102,8 +102,8 @@ return [
     |
     */
 
+    // No 'database': there is no application database, a batch goes where its module is.
     'batching' => [
-        'database' => env('DB_CONNECTION', 'sqlite'),
         'table' => 'job_batches',
     ],
 
@@ -120,9 +120,9 @@ return [
     |
     */
 
+    // No 'database': there is no application database, a failed job goes where its module is.
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'sqlite'),
         'table' => 'failed_jobs',
     ],
 

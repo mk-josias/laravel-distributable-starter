@@ -14,7 +14,7 @@ use Illuminate\Console\Scheduling\Schedule;
 
 final class AnalyticsServiceProvider extends ServiceProvider
 {
-    protected array $handlers = [
+    protected array $streamHandlers = [
         IamEvent::UserRegistered->value => [RecordSignup::class],
         NotificationsEvent::MailSent->value => [RecordMail::class],
     ];

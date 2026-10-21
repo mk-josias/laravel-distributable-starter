@@ -18,9 +18,6 @@ return [
 
     'default' => env('DB_CONNECTION', 'sqlite'),
 
-    // The connection migrations and DDL run on; null: the default one. A module names its own, as it names its `default`.
-    'owner' => null,
-
     /*
     |--------------------------------------------------------------------------
     | Database Connections

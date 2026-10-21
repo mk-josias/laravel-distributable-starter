@@ -112,7 +112,7 @@ final class SetupSkeleton extends Command
             "COPY --from=vendor /packages /packages\n",
         ]);
 
-        foreach (['docker-compose.yml', 'docker-compose.mono.yml'] as $file) {
+        foreach (['docker-compose.mesh.yml', 'docker-compose.mono.yml'] as $file) {
             file_put_contents(base_path($file), (string) preg_replace(
                 '/^(\s+)additional_contexts:\n\1  packages: .*\n/m',
                 '',
@@ -150,7 +150,7 @@ final class SetupSkeleton extends Command
     /** Drops the module's service and its names from the lists the containers read. */
     private function removeFromCompose(string $module): void
     {
-        foreach (['docker-compose.yml', 'docker-compose.mono.yml'] as $file) {
+        foreach (['docker-compose.mesh.yml', 'docker-compose.mono.yml'] as $file) {
             $contents = (string) file_get_contents(base_path($file));
             $contents = (string) preg_replace("/^  {$module}:\n(?:(?:    .*)?\n)*/m", '', $contents);
             $contents = (string) preg_replace("/^(\s+aliases: \[.*), {$module}(?=[,\]])/m", '$1', $contents);

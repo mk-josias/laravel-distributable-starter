@@ -37,11 +37,16 @@ abstract class TestCase extends BaseTestCase
 
             $this->databases[] = $file = (string) tempnam(sys_get_temp_dir(), "{$module->name}-");
 
-            config()->set("database.connections.{$module->defaultConnection()}.database", $file);
-            DB::purge($module->defaultConnection());
+            // A module's connections are set in the module: only there are they configured.
+            $this->inModule($module->name, static function () use ($module, $file): void {
+                foreach ($module->declaredConnections() as $connection) {
+                    config()->set("database.connections.{$connection}.database", $file);
+                    DB::purge($connection);
+                }
+            });
         }
 
-        $this->artisan('migrate')->assertSuccessful();
+        $this->artisan('migrate --module=*')->assertSuccessful();
     }
 
     protected function tearDown(): void
