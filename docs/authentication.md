@@ -26,10 +26,17 @@ request ─► X-Identity ─► Identity ─► PrincipalResolver ─► Princi
          TrustedIdentity  sub, claims  where is the user?               what may it do?
 ```
 
-| Interface | Config key | Shipped | To add your own |
-|---|---|---|---|
-| `PrincipalResolver` | `auth.principal_resolver` | `LocalPrincipals`: the user's row in the running module's own database, through `auth.principal`: `UserShadow` in the modules that keep it, `User` in iam, which sets it in its `config/auth.php`. `ClaimsPrincipals`: the user is built from the claims, no row. `RpcPrincipals`: the user iam returns for the id | name your class |
-| `PermissionSource` | `auth.permission_source` | `RpcPermissions`: `IamClient::grants()`. `ClaimsPermissions`: the `permissions` claim | name your class |
+- **`PrincipalResolver`**
+  - Config key: `auth.principal_resolver`
+  - Shipped: `LocalPrincipals`: the user's row in the running module's own database, through
+    `auth.principal`: `UserShadow` in the modules that keep it, `User` in iam, which sets it in its
+    `config/auth.php`. `ClaimsPrincipals`: the user is built from the claims, no row.
+    `RpcPrincipals`: the user iam returns for the id
+  - To add your own: name your class
+- **`PermissionSource`**
+  - Config key: `auth.permission_source`
+  - Shipped: `RpcPermissions`: `IamClient::grants()`. `ClaimsPermissions`: the `permissions` claim
+  - To add your own: name your class
 
 A request is refused (401, Laravel's `AuthenticationException`) when its `X-Identity` is missing,
 expired or not signed with the secret. With `LocalPrincipals` it is also refused while the module
@@ -45,11 +52,14 @@ the authenticated user.
 to issue the token that strategy checks (`POST /iam/api/v1/login` and `/refresh`): both must read
 the same value.
 
-| | `signature` (default) | `issuer` |
-|---|---|---|
-| The token iam issues | a JWT, `sub` = the user id | a Sanctum personal access token; iam stores its hash, one per device |
-| The gateway checks it | with iam's public key, then the cached user | by asking iam, on every request |
-| Settings | the key pair, in `AUTH_JWT_KEYS_PATH` or `AUTH_JWT_*_KEY` | none |
+- **`signature` (default)**
+  - The token iam issues: a JWT, `sub` = the user id
+  - The gateway checks it: with iam's public key, then the cached user
+  - Settings: the key pair, in `AUTH_JWT_KEYS_PATH` or `AUTH_JWT_*_KEY`
+- **`issuer`**
+  - The token iam issues: a Sanctum personal access token; iam stores its hash, one per device
+  - The gateway checks it: by asking iam, on every request
+  - Settings: none
 
 `AUTH_TOKEN_TTL` is how long a token lives, whichever the strategy. Under `issuer`, a logout
 (`POST /iam/api/v1/logout`, or `/logout-all` for every device) stops the token at once, so it
@@ -106,11 +116,10 @@ AUTH_PRINCIPAL_RESOLVER=Foundation\Common\Auth\ClaimsPrincipals
 AUTH_PERMISSION_SOURCE=Foundation\Common\Auth\ClaimsPermissions
 ```
 
-| The provider's claim | What the modules read |
-|---|---|
-| `sub` | the user's id, an integer or a string (`usr_7f3a`) |
-| `permissions` (`auth.permissions_claim`) | the list the policies check, such as `analytics.datasets.read` |
-| any other claim | the user is a `ClaimsPrincipal`: `$principal->claim('email')` |
+- **`sub`:** the user's id, an integer or a string (`usr_7f3a`)
+- **`permissions` (`auth.permissions_claim`):** the list the policies check, such as
+  `analytics.datasets.read`
+- **any other claim:** the user is a `ClaimsPrincipal`: `$principal->claim('email')`
 
 `apps/Analytics/tests/Feature/ExternalIdentityTest.php` runs it. To keep the users' names locally
 all the same, the provider can feed the modules' copies: see "Being the source of a copy" in the
@@ -118,15 +127,17 @@ package's `docs/other-languages.md`.
 
 ## Without authentication
 
-The package has no authentication of its own: all of it lives in this skeleton, in
+The package has no authentication of its own: all of it lives in this starter, in
 `foundation/Common/Auth`, `foundation/Common/Contracts/Auth`, `foundation/Common/Http/Middleware/Authenticate.php`,
 `foundation/Common/Policies` and `foundation/Iam/Auth`. These use them:
 
-| File | What to remove |
-|---|---|
-| `foundation/FoundationServiceProvider.php` | the three bindings of `register()` |
-| `apps/*/routes/api.php` | the `Authenticate` middleware |
-| `foundation/Common/Http/Controllers/Controller.php`, `Http/Requests/ApiRequest.php` | `use HasPrincipal` |
-| `apps/Iam/app/Models/User.php`, `foundation/Iam/Shadows/UserShadow.php` | `IsPrincipal` and `implements Principal` |
-| `apps/Analytics/app/Policies/DatasetPolicy.php` | the policy, and `authorize()` in `MetricController` |
-| `tests/ModuleTestCase.php`, `apps/*/tests/Feature`, `tests/Integration` | the tests that send a token |
+- **`foundation/FoundationServiceProvider.php`:** the three bindings of `register()`
+- **`apps/*/routes/api.php`:** the `Authenticate` middleware
+- **`foundation/Common/Http/Controllers/Controller.php`, `Http/Requests/ApiRequest.php`:** `use
+  HasPrincipal`
+- **`apps/Iam/app/Models/User.php`, `foundation/Iam/Shadows/UserShadow.php`:** `IsPrincipal` and
+  `implements Principal`
+- **`apps/Analytics/app/Policies/DatasetPolicy.php`:** the policy, and `authorize()` in
+  `MetricController`
+- **`tests/ModuleTestCase.php`, `apps/*/tests/Feature`, `tests/Integration`:** the tests that send a
+  token

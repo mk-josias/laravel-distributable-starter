@@ -28,19 +28,25 @@ class InboxTest extends ModuleTestCase
 }
 ```
 
-| Helper | What it does |
-|---|---|
-| `user($id, $name, $permissions)` | writes the user's copy in the module's database, makes iam answer `$permissions` to `grants()`, and returns the `Authorization` header of a valid token |
-| `receive($module, $name, $payload)` | hands the module an event as its emitter would have announced it (from the package) |
+- **`user($id, $name, $permissions)`:** writes the user's copy in the module's database, makes iam
+  answer `$permissions` to `grants()`, and returns the `Authorization` header of a valid token
+- **`receive($module, $name, $payload)`:** hands the module an event as its emitter would have
+  announced it (from the package)
 
 Because a module's tests name no other module's class, `Boundaries` holds for them too.
 
-| Level | Where | Suite |
-|---|---|---|
-| unit | `tests/Unit`, `apps/{Module}/tests/Unit` | `Unit` |
-| component | `apps/{Module}/tests/Feature` | `Modules` |
-| integration | `tests/Integration` | `Integration` |
-| end to end | `tests/e2e/together-or-apart.sh` | none |
+- **unit**
+  - Where: `tests/Unit`, `apps/{Module}/tests/Unit`
+  - Suite: `Unit`
+- **component**
+  - Where: `apps/{Module}/tests/Feature`
+  - Suite: `Modules`
+- **integration**
+  - Where: `tests/Integration`
+  - Suite: `Integration`
+- **end to end**
+  - Where: `tests/e2e/together-or-apart.sh`
+  - Suite: none
 
 - **Unit**: a class alone, with no database, HTTP or container.
 - **Component**: one module alone, through its routes and the events it receives.

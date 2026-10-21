@@ -16,7 +16,5 @@ goes through RPC and the answer is cached.
 - Change permissions only through iam's actions, never by calling spatie directly, so the cache
   stays right. Each action clears the cache once its transaction commits:
 
-  | Action | Clears |
-  |---|---|
-  | `GrantRole::grant()` / `revoke()` | that user's cached grants |
-  | `SetRolePermissions::execute()` | every user's cached grants |
+  - `GrantRole::grant()` and `revoke()` clear that user's cached grants
+  - `SetRolePermissions::execute()` clears every user's cached grants
